@@ -3,6 +3,8 @@
 
 # In[1]:
 
+import uuid
+import gc
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -33,6 +35,8 @@ from tensorflow.python.keras import models, losses, layers
 
 import IPython.display
 
+#Flask logging
+import logging
 
 # In[2]:
 
@@ -47,6 +51,28 @@ import IPython.display
 tf.enable_eager_execution()
 print("Eager execution: {}".format(tf.executing_eagerly()))
 
+content_layers = ['block5_conv2'] 
+style_layers = ['block1_conv1',
+                'block2_conv1',
+                'block3_conv1', 
+                'block4_conv1', 
+                'block5_conv1']
+
+content_layers_inc = ['mixed6']
+style_layers_inc = [
+    'mixed5', 'mixed6', 'mixed7', 'mixed8', 'mixed9'
+]
+
+num_content_layers = len(content_layers)
+num_style_layers = len(style_layers)
+num_content_layers_inc = len(content_layers_inc)
+num_style_layers_inc = len(style_layers_inc)
+
+LOG_FILENAME = '/logs/model_log.out'
+logger = logging.getLogger(__name__)
+logger.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
+
+logger.debug('Initializing model log file.')
 
 # ### Mount google drive
 
@@ -164,7 +190,7 @@ def plot_side_by_side(content_image_path, style_image_path, result_image=None,
 # In[15]:
 
 
-plot_side_by_side(content_image_path, style_image_path)
+# plot_side_by_side(content_image_path, style_image_path)
 
 
 # ### Preprocessing of content and style images
@@ -192,7 +218,8 @@ def deprocess_img(processed_img, inception=False):
     assert len(x.shape) == 3, ("Input to deprocess image must be an image of "
                              "dimension [1, height, width, channel] or [height, width, channel]")
     if len(x.shape) != 3:
-        raise ValueError("Invalid input to deprocessing image")
+        logger.exception("Invalid input to deprocessing image")
+        raise
         
     if inception:
       x *= 255.
@@ -216,7 +243,7 @@ def deprocess_img(processed_img, inception=False):
 
 # In[18]:
 
-
+'''
 style_image_vgg = preprocess_img(style_image_path, prp_type=vgg16_prp)
 plot_image(style_image_vgg)
 
@@ -226,29 +253,14 @@ plot_image(style_image_vgg)
 
 style_image_vgg = deprocess_img(style_image_vgg, inception=False)
 plot_image(style_image_vgg)
-
+'''
 
 # ### Model layers for feature selection
 
 # In[20]:
 
 
-content_layers = ['block5_conv2'] 
-style_layers = ['block1_conv1',
-                'block2_conv1',
-                'block3_conv1', 
-                'block4_conv1', 
-                'block5_conv1']
 
-content_layers_inc = ['mixed6']
-style_layers_inc = [
-    'mixed5', 'mixed6', 'mixed7', 'mixed8', 'mixed9'
-]
-
-num_content_layers = len(content_layers)
-num_style_layers = len(style_layers)
-num_content_layers_inc = len(content_layers_inc)
-num_style_layers_inc = len(style_layers_inc)
 
 
 # ### Build VGG Model
@@ -417,7 +429,8 @@ def plot_learning_curve(iterations, total_losses, style_losses, content_losses, 
   '''
   
   #plt.savefig(img_file_name + '_loss.png')
-  print('Saved loss figure to drive.')
+  #print('Saved loss figure to drive.')
+  logger.info('Saved loss figure to drive.')
   plt.tight_layout()
   plt.show()
 
@@ -435,7 +448,8 @@ def plot_time(iterations, times, img_file_name):
   plt.plot(iterations, times, label="Total loss")
   
   #plt.savefig(img_file_name + '_time.png')
-  print('Saved time figure to drive.')
+  #print('Saved time figure to drive.')
+  logger.info('Saved time figure to drive.')
   plt.tight_layout()
   plt.show()
 
@@ -464,7 +478,8 @@ def save_image(best_img, path):
   best_img = best_img.astype('uint8')
   img = Image.fromarray(best_img)
   img.save(path + '.png')
-  print('Saved image to drive.')
+  #print('Saved image to drive.')
+  logger.info('Saved image to drive.')
 
 
 # In[43]:
@@ -487,7 +502,8 @@ def save_config(total_losses, style_losses, content_losses, iterations, times, i
 
   with open(image_path + '_cfg.txt', 'w') as file:
     file.write(str(output_conf))
-  print('Saved config to cloud drive.')
+  #print('Saved config to cloud drive.')
+  logger.info('Saved config to cloud drive.')
 
 
 # ### Optimization method
@@ -497,9 +513,8 @@ def save_config(total_losses, style_losses, content_losses, iterations, times, i
 
 def run_style_transfer(content_path, 
                        style_path,
-                       image_title,
                        model_name=VGG16,
-                       num_iterations=1000,
+                       num_iterations=100,
                        content_weight=1e3, 
                        style_weight=1e-2,
                        lr=5,
@@ -517,7 +532,8 @@ def run_style_transfer(content_path,
     elif model_name==VGG16:
       prp_type = vgg16_prp
     else:
-      raise TypeError("Unsupported model architecture.")
+      logger.exception("Unsupported model architecture.")
+      raise
      
     model = get_model(model_name, inception) 
     print(model)
@@ -606,21 +622,28 @@ def run_style_transfer(content_path,
               content_losses_np.append('{:.4e}'.format(content_score.numpy()))
            
             
-            plot_image(plot_img)
-            plt.show()
+            #plot_image(plot_img)
+            #plt.show()
             
-            print('Iteration: {}'.format(i))        
-            print('Total loss: {:.4e}, ' 
+            #print('Iteration: {}'.format(i))        
+            #print('Total loss: {:.4e}, ' 
+                #'Style loss: {:.4e}, '
+               # 'Content loss: {:.4e}, '
+               # 'Time: {:.4f}s'.format(loss, style_score, content_score, time.time() - start_time))
+            logger.info('Iteration: {}'.format(i))
+            logger.info('Total loss: {:.4e}, ' 
                 'Style loss: {:.4e}, '
                 'Content loss: {:.4e}, '
                 'Time: {:.4f}s'.format(loss, style_score, content_score, time.time() - start_time))
         
-    print('Total time: {:.4f}s'.format(time.time() - global_start))
+    #print('Total time: {:.4f}s'.format(time.time() - global_start))
+    logger.info('Total time: {:.4f}s'.format(time.time() - global_start))
     
     # Uncomment these lines to save the results to your Google Drive (you first need to have it mounted)
     #save_image(best_img, cfg_path + image_title)
     #save_config(total_losses_np, style_losses_np, content_losses_np, iterations, times_np, cfg_path + image_title)
     
+    '''
     plt.figure(figsize=(14,4))
     for i,img in enumerate(imgs):
         plt.subplot(num_rows,num_cols,i+1)
@@ -634,11 +657,36 @@ def run_style_transfer(content_path,
         plt.gca().get_xaxis().set_visible(False)
         plt.imshow(output)
     plt.show()
+	'''
 
-    return best_img, total_losses, style_losses, content_losses, iterations, times
+    unique_name = str(uuid.uuid4()) + ".png"
+    result_path = "static/images/" + unique_name
+    save_image(best_img, result_path)
+    
+    return best_img, total_losses, style_losses, content_losses, iterations, times, unique_name
 
 
 # ### Run tests
+
+def main(content_image_path, style_image_path):
+
+    content_image_path  = 'static/images/' + content_image_path
+    style_image_path = 'static/images/' + style_image_path
+    params = {
+        'content_image' : content_image_path,
+        'style_image' : style_image_path,
+        'model_name' : VGG16,
+        'num_iterations' : 100,
+        'content_weight':1e3, 
+        'style_weight':1e-2,
+        'lr':5,
+        'beta1':0.99,
+        'epsilon':1e-1,
+        'cfg_path':'output/'
+    }
+    f_name = style_transfer(**params)
+    gc.collect()
+    return f_name
 
 # In[51]:
 
