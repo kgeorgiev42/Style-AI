@@ -28,11 +28,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="runserver.py" />
+    <Compile Include="st_webservice\model\run_st.py" />
     <Compile Include="st_webservice\__init__.py" />
     <Compile Include="st_webservice\views.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="st_webservice\" />
+    <Folder Include="st_webservice\model\" />
     <Folder Include="st_webservice\static\" />
     <Folder Include="st_webservice\static\content\" />
     <Folder Include="st_webservice\static\fonts\" />
