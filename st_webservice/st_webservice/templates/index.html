@@ -1,33 +1,49 @@
 {% extends "layout.html" %}
 
-{% block content %}
+{% block index %}
+<section id="intro">
 
-<div class="jumbotron">
-    <h1>Flask</h1>
-    <p class="lead">Flask is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="http://flask.pocoo.org/" class="btn btn-primary btn-large">Learn more &raquo;</a></p>
-</div>
+    <div class="intro-text">
+        <h2>Style Transfer Web Service</h2>
+        <p>Create artistic images using Deep Learning. No talent required!</p>
+        <br>
+        <p>Here are some generated examples.</p>
+        <!--<a href="#about" class="btn-get-started scrollto">Get Started</a>-->
+    </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            Flask gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://flask.pocoo.org/docs/">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>The Python Package Index is a repository of software for the Python programming language.</p>
-        <p><a class="btn btn-default" href="https://pypi.python.org/pypi">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Microsoft Azure</h2>
-        <p>You can easily publish to Microsoft Azure using Visual Studio. Find out how you can host your application using a free trial today.</p>
-        <p><a class="btn btn-default" href="http://azure.microsoft.com">Learn more &raquo;</a></p>
-    </div>
-</div>
+    <div class="product-screens">
 
-{% endblock %}
+        <div class="product-screen-1 wow fadeInUp" data-wow-delay="0.4s" data-wow-duration="0.6s">
+            <img src="../static/img/neil.png" alt="">
+        </div>
+
+        <div class="product-screen-2 wow fadeInUp" data-wow-delay="0.2s" data-wow-duration="0.6s">
+            <img src="../static/img/pelican.png" alt="">
+        </div>
+
+        <div class="product-screen-3 wow fadeInUp" data-wow-duration="0.6s">
+            <img src="../static/img/scenery.png" alt="">
+        </div>
+
+    </div>
+</section>
+    {% endblock %}
+
+    {% block start %}
+
+    <section id="call-to-action">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-9 text-center text-lg-left">
+                    <h3 class="cta-title">Get Started</h3>
+                    <p class="cta-text"> Import your own custom images for style and content and merge them into one single artistic piece!</p>
+                </div>
+                <div class="col-lg-3 cta-btn-container text-center">
+                    <a class="cta-btn align-middle" href="features.html">Create Art</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    {% endblock %}

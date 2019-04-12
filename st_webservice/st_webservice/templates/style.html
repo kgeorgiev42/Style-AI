@@ -1,0 +1,52 @@
+﻿{% extends "layout.html" %}
+
+{% block style %}
+
+<section id="about">
+    <div class="container-fluid">
+        <div class="section-header">
+            <h3 class="section-title">Create art with Style AI</h3>
+            <span class="section-divider"></span>
+            <p class="section-description">
+                Import custom content and style images and mix them to create the perfect painting.
+            </p>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-7 content wow fadeInLeft">
+                <div class="container-fluid">
+                    <form action="" method="post" role="form" class="contactForm" style="margin: 0 auto;">
+                        <h2 class="text-center">Upload your images</h2>
+                        <div class="form-row">
+                            <div class="form-group col-lg-8">
+                                <h4>Content File</h4>
+                                <input type="file" name=content-file class="form-control" />
+                                <div class="validation"></div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-lg-8">
+                                <h4>Style File</h4>
+                                <input type="file" name=style-file class="form-control" />
+                                <div class="validation"></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-8 content wow fadeInLeft">
+                            <div class="cta-btn-container text-center"><button class="btn btn-outline btn-xl" data-loading-text="Loading..." type="submit" title="Upload images" onclick="loading();">Upload</button></div>
+                            </div>
+                    </form>
+                    </div>
+                </div>
+
+
+            <div class="col-lg-5 about-img wow fadeInRight">
+                <div class="container-fluid" style="margin-top:20px;">
+                    <img src="../static/img/gallery/gallery-4.jpg" alt="">
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section><!-- #about -->
+{% endblock %}

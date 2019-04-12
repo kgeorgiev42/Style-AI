@@ -1,10 +1,37 @@
-{% extends "layout.html" %}
+﻿{% extends "layout.html" %}
 
-{% block content %}
+{% block about %}
 
-<h2>{{ title }}.</h2>
-<h3>{{ message }}</h3>
+<section id="team" class="intro-text">
+    <div class="container">
+        <div class="section-header">
+            <h3 class="section-title">About the project</h3>
+            <span class="section-divider"></span>
+            <p class="section-description">
+                Style AI is a web service based on the Style Transfer Generative model created
+                by <b>Leon A. Gatys, Alexander S. Ecker, and Matthias Bethge</b> and documented in their paper
+                   <a href="https://arxiv.org/abs/1508.06576">A Neural Algorithm of Artistic Style</a> in 2015.
+                <br />
+                To make this model work, famous deep learning architectures for image recognition are utilized such as 
+                <a href="https://arxiv.org/pdf/1409.1556.pdf">VGG16 and VGG19</a>.
+            </p>
+        </div>
+        <div class="row wow fadeInUp">
+            <div class="col-lg-12 col-md-6">
+                <div class="member">
+                    <div class="pic"><img src="../static/img/team/team-3.jpg" alt=""></div>
+                    <h4>Konstantin Georgiev</h4>
+                    <span>Student in TU-Varna BG</span>
+                    <div class="social">
+                        <a href=""><i class="fa fa-twitter"></i></a>
+                        <a href=""><i class="fa fa-github"></i></a>
+                        <a href=""><i class="fa fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
 
-<p>Use this area to provide additional information.</p>
+        </div>
 
+    </div>
+</section><!-- #team -->
 {% endblock %}

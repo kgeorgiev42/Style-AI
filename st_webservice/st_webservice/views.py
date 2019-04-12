@@ -12,18 +12,15 @@ def home():
     """Renders the home page."""
     return render_template(
         'index.html',
-        title='Home Page',
         year=datetime.now().year,
     )
 
-@app.route('/contact')
-def contact():
-    """Renders the contact page."""
+@app.route('/gallery')
+def gallery():
+    """Renders the gallery page."""
     return render_template(
-        'contact.html',
-        title='Contact',
+        'gallery.html',
         year=datetime.now().year,
-        message='Your contact page.'
     )
 
 @app.route('/about')
@@ -31,7 +28,13 @@ def about():
     """Renders the about page."""
     return render_template(
         'about.html',
-        title='About',
         year=datetime.now().year,
-        message='Your application description page.'
+    )
+
+@app.route('/style')
+def style():
+    """Renders the style page."""
+    return render_template(
+        'style.html',
+        year=datetime.now().year,
     )

@@ -536,7 +536,7 @@ def run_style_transfer(content_path,
       raise
      
     model = get_model(model_name, inception) 
-    print(model)
+    # print(model)
     for layer in model.layers:
         layer.trainable = False
 
@@ -625,19 +625,13 @@ def run_style_transfer(content_path,
             #plot_image(plot_img)
             #plt.show()
             
-            #print('Iteration: {}'.format(i))        
-            #print('Total loss: {:.4e}, ' 
-                #'Style loss: {:.4e}, '
-               # 'Content loss: {:.4e}, '
-               # 'Time: {:.4f}s'.format(loss, style_score, content_score, time.time() - start_time))
-            logger.info('Iteration: {}'.format(i))
-            logger.info('Total loss: {:.4e}, ' 
+            print('Iteration: {}'.format(i))        
+            print('Total loss: {:.4e}, ' 
                 'Style loss: {:.4e}, '
                 'Content loss: {:.4e}, '
                 'Time: {:.4f}s'.format(loss, style_score, content_score, time.time() - start_time))
         
-    #print('Total time: {:.4f}s'.format(time.time() - global_start))
-    logger.info('Total time: {:.4f}s'.format(time.time() - global_start))
+    print('Total time: {:.4f}s'.format(time.time() - global_start))
     
     # Uncomment these lines to save the results to your Google Drive (you first need to have it mounted)
     #save_image(best_img, cfg_path + image_title)
@@ -660,18 +654,25 @@ def run_style_transfer(content_path,
 	'''
 
     unique_name = str(uuid.uuid4()) + ".png"
-    result_path = "static/images/" + unique_name
+    result_path = "static/images/output/" + unique_name
     save_image(best_img, result_path)
+
+    result_dict = {
+        'image': best_img,
+        'total_losses': total_losses,
+        'content_losses': content_losses,
+        'iterations': iterations,
+        'times': times,
+        'name': unique_name
+    }
     
-    return best_img, total_losses, style_losses, content_losses, iterations, times, unique_name
+    return result_dict
 
 
 # ### Run tests
 
-def main(content_image_path, style_image_path):
-
-    content_image_path  = 'static/images/' + content_image_path
-    style_image_path = 'static/images/' + style_image_path
+def run_model(content_image_path, style_image_path):
+ 
     params = {
         'content_image' : content_image_path,
         'style_image' : style_image_path,
@@ -682,11 +683,12 @@ def main(content_image_path, style_image_path):
         'lr':5,
         'beta1':0.99,
         'epsilon':1e-1,
-        'cfg_path':'output/'
+        'cfg_path':'static/images/output/graphs/'
     }
-    f_name = style_transfer(**params)
+
+    result_dict = run_style_transfer(**params)
     gc.collect()
-    return f_name
+    return result_dict
 
 # In[51]:
 

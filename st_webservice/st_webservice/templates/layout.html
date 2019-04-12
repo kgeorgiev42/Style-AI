@@ -1,47 +1,134 @@
+﻿
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }} - My Flask Application</title>
-    <link rel="stylesheet" type="text/css" href="/static/content/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="/static/content/site.css" />
-    <script src="/static/scripts/modernizr-2.6.2.js"></script>
+    <meta charset="utf-8">
+    <title>Style Transfer Web Service</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicons -->
+    <link href="../static/img/favicon.png" rel="icon">
+    <link href="../static/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,700|Open+Sans:300,300i,400,400i,700,700i" rel="stylesheet">
+
+    <!-- Bootstrap CSS File -->
+    <link href="../static/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Libraries CSS Files -->
+    <link href="../static/lib/animate/animate.min.css" rel="stylesheet">
+    <link href="../static/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../static/lib/ionicons/css/ionicons.min.css" rel="stylesheet">
+    <link href="../static/lib/magnific-popup/magnific-popup.css" rel="stylesheet">
+
+    <!-- Main Stylesheet File -->
+    <link href="../static/css/style.css" rel="stylesheet">
+
+    <!-- =======================================================
+      Theme Name: Avilon
+      Theme URL: https://bootstrapmade.com/avilon-bootstrap-landing-page-template/
+      Author: BootstrapMade.com
+      License: https://bootstrapmade.com/license/
+    ======================================================= -->
 </head>
 
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
+
+    <header id="header">
         <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a href="/" class="navbar-brand">Application name</a>
+
+            <div id="logo" class="pull-left">
+                <h1><a href="{{ url_for('home') }}" class="scrollto">Style AI</a></h1>
+                <!-- Uncomment below if you prefer to use an image logo -->
+                <!--<a href="/st_webservice/"><img src="../static/img/logo.png" alt="" title=""></a> -->
             </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('home') }}">Home</a></li>
+
+            <nav id="nav-menu-container">
+                <ul class="nav-menu">
+                    <li class="menu-active"><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('style') }}">Style</a></li>
+                    <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
                     <li><a href="{{ url_for('about') }}">About</a></li>
-                    <li><a href="{{ url_for('contact') }}">Contact</a></li>
                 </ul>
+            </nav>
+        </div>
+    </header>
+
+   
+
+
+    <main id="main">
+
+        {% block index %}{% endblock %}
+        {% block start %}{% endblock %}
+        {% block about %}{% endblock %}
+        {% block contact %}{% endblock %}
+        {% block gallery %}{% endblock %}
+        {% block style %}{% endblock %}
+
+
+
+    </main>
+
+
+    <!--==========================
+      Footer
+    ============================-->
+    <footer id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 text-lg-left text-center">
+                    <div class="copyright">
+                        &copy; Copyright <strong>Avilon</strong>. All Rights Reserved
+                    </div>
+                    <div class="credits">
+                        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <nav class="footer-links text-lg-right text-center pt-2 pt-lg-0">
+                        <a href="{{ url_for('home') }}" class="scrollto">Home</a>
+                        <a href="{{ url_for('gallery') }}" class="scrollto">Gallery</a>
+                        <a href="{{ url_for('about') }}" class="scrollto">About</a>
+                    </nav>
+                </div>
             </div>
         </div>
-    </div>
+    </footer><!-- #footer -->
 
-    <div class="container body-content">
-        {% block content %}{% endblock %}
-        <hr />
-        <footer>
-            <p>&copy; {{ year }} - My Flask Application</p>
-        </footer>
-    </div>
 
-    <script src="/static/scripts/jquery-1.10.2.js"></script>
-    <script src="/static/scripts/bootstrap.js"></script>
-    <script src="/static/scripts/respond.js"></script>
-    {% block scripts %}{% endblock %}
+    <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
 
+    <!-- JavaScript Libraries -->
+    <script src="../static/lib/jquery/jquery.min.js"></script>
+    <script src="../static/lib/jquery/jquery-migrate.min.js"></script>
+    <script src="../static/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/lib/easing/easing.min.js"></script>
+    <script src="../static/lib/wow/wow.min.js"></script>
+    <script src="../static/lib/superfish/hoverIntent.js"></script>
+    <script src="../static/lib/superfish/superfish.min.js"></script>
+    <script src="../static/lib/magnific-popup/magnific-popup.min.js"></script>
+
+    <!-- Contact Form JavaScript File -->
+    <script src="../static/contactform/contactform.js"></script>
+
+    <!-- Template Main Javascript File -->
+    <script src="../static/js/main.js"></script>
+
+
+    <script type="text/javascript">
+        // <![CDATA[
+        function loading() {
+            $("#loading").show();
+            $("#loading-gif").show();
+            $("#content").hide();
+        }
+                    // ]]></script>
 </body>
+
+
 </html>
