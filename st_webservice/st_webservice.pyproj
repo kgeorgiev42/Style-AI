@@ -17,6 +17,7 @@
     <SuppressCollectPythonCloudServiceFiles>true</SuppressCollectPythonCloudServiceFiles>
     <Name>st_webservice</Name>
     <RootNamespace>st_webservice</RootNamespace>
+    <InterpreterId>CondaEnv|CondaEnv|tf-style</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,6 +33,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="st_webservice\model\run_st.py" />
+    <Compile Include="st_webservice\model\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="st_webservice\utils.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="st_webservice\__init__.py" />
     <Compile Include="st_webservice\views.py" />
   </ItemGroup>
@@ -155,9 +162,13 @@
     <Content Include="st_webservice\static\lib\wow\wow.min.js" />
     <Content Include="st_webservice\templates\gallery.html" />
     <Content Include="st_webservice\templates\index.html" />
+    <Content Include="st_webservice\templates\results.html" />
     <Content Include="st_webservice\templates\start.html" />
     <Content Include="st_webservice\templates\style.html" />
     <Content Include="st_webservice\templates\layout.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="CondaEnv|CondaEnv|tf-style" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 

@@ -13,12 +13,18 @@
     <link href="../static/img/favicon.png" rel="icon">
     <link href="../static/img/apple-touch-icon.png" rel="apple-touch-icon">
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+
+    <!-- Material Design Bootstrap -->
+    <link href="../static/css/mdb.min.css" rel="stylesheet">
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,700|Open+Sans:300,300i,400,400i,700,700i" rel="stylesheet">
 
     <!-- Bootstrap CSS File -->
-    <link href="../static/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <!-- <link href="../static/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet"> -->
     <!-- Libraries CSS Files -->
     <link href="../static/lib/animate/animate.min.css" rel="stylesheet">
     <link href="../static/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
@@ -58,7 +64,7 @@
         </div>
     </header>
 
-   
+
 
 
     <main id="main">
@@ -69,6 +75,7 @@
         {% block contact %}{% endblock %}
         {% block gallery %}{% endblock %}
         {% block style %}{% endblock %}
+        {% block results %}{% endblock %}
 
 
 
@@ -113,21 +120,99 @@
     <script src="../static/lib/superfish/superfish.min.js"></script>
     <script src="../static/lib/magnific-popup/magnific-popup.min.js"></script>
 
+
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="../static/js/popper.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="../static/js/mdb.min.js"></script>
+
     <!-- Contact Form JavaScript File -->
     <script src="../static/contactform/contactform.js"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 
     <!-- Template Main Javascript File -->
     <script src="../static/js/main.js"></script>
 
 
     <script type="text/javascript">
-        // <![CDATA[
-        function loading() {
-            $("#loading").show();
-            $("#loading-gif").show();
-            $("#content").hide();
-        }
-                    // ]]></script>
+        $(document).ready(function () {
+            $(document).on('change', '.btn-file :file', function () {
+                var input = $(this),
+                    label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+                input.trigger('fileselect', [label]);
+            });
+
+            $('.btn-file :file').on('fileselect', function (event, label) {
+
+                var input = $(this).parents('.input-group').find(':text'),
+                    log = label;
+
+                if (input.length) {
+                    input.val(log);
+                } else {
+                    if (log) alert(log);
+                }
+
+            });
+            function readContentURL(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        $('#img-upload-content').attr('src', e.target.result);
+                    }
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            function readStyleURL(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        $('#img-upload-style').attr('src', e.target.result);
+                    }
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            $("#imgInpContent").change(function () {
+                var ext = $('#imgInpContent').val().split('.').pop().toLowerCase();
+                if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
+                    $('#val_message_cont').text('Invalid extension!');
+                }
+                else {
+                    readContentURL(this);
+                    $('#val_message_cont').text('');
+                }
+            });
+
+            $("#imgInpStyle").change(function () {
+                var ext = $('#imgInpStyle').val().split('.').pop().toLowerCase();
+                if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
+                    $('#val_message_style').text('Invalid extension!');
+                }
+                else {
+                    readStyleURL(this);
+                    $('#val_message_style').text('');
+                }
+            });
+
+            $("#upload-form").submit(function () {
+                if ($('#val_message_style').text() == "" && $('#val_message_text').text() == "") {
+                    $('#load').text('Generating image..');
+                    $('#gif').css('visibility', 'visible');
+                    $('.err-mes').text('');
+                    return true;
+                }
+                return false;
+            });
+
+        });
+    </script>
 </body>
 
 

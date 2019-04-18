@@ -4,6 +4,7 @@
 # In[1]:
 
 import uuid
+from st_webservice import app
 import gc
 
 import numpy as np
@@ -35,9 +36,6 @@ from tensorflow.python.keras import models, losses, layers
 
 import IPython.display
 
-#Flask logging
-import logging
-
 # In[2]:
 
 
@@ -68,11 +66,6 @@ num_style_layers = len(style_layers)
 num_content_layers_inc = len(content_layers_inc)
 num_style_layers_inc = len(style_layers_inc)
 
-LOG_FILENAME = '/logs/model_log.out'
-logger = logging.getLogger(__name__)
-logger.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
-
-logger.debug('Initializing model log file.')
 
 # ### Mount google drive
 
@@ -217,9 +210,11 @@ def deprocess_img(processed_img, inception=False):
         x = np.squeeze(x, 0)
     assert len(x.shape) == 3, ("Input to deprocess image must be an image of "
                              "dimension [1, height, width, channel] or [height, width, channel]")
+
     if len(x.shape) != 3:
-        logger.exception("Invalid input to deprocessing image")
-        raise
+        message = "Invalid input to deprocessing image." 
+        app.logger.error(message)
+        return
         
     if inception:
       x *= 255.
@@ -284,7 +279,7 @@ def get_model(model_name, inception=False):
       
     model_outputs = style_outputs + content_outputs
 
-    return models.Model(loaded_model.input, model_outputs)
+    return models.Model(loaded_model.input, model_outputs), loaded_model.name
 
 
 # ### Define content loss
@@ -328,9 +323,11 @@ def get_feature_representations(model, content_path, style_path, prp_type):
     content_image = preprocess_img(content_path, prp_type)
     style_image = preprocess_img(style_path, prp_type)
 
+    #TODO: err InvalidArgumentError: input depth must be evenly divisible by filter depth: 4 vs 3 [Op:Conv2D]
     # batch compute content and style features
     style_outputs = model(style_image)
     content_outputs = model(content_image)
+    
 
 
     # Get the style and content feature representations from our model  
@@ -429,8 +426,7 @@ def plot_learning_curve(iterations, total_losses, style_losses, content_losses, 
   '''
   
   #plt.savefig(img_file_name + '_loss.png')
-  #print('Saved loss figure to drive.')
-  logger.info('Saved loss figure to drive.')
+  print('Saved loss figure to drive.')
   plt.tight_layout()
   plt.show()
 
@@ -448,8 +444,7 @@ def plot_time(iterations, times, img_file_name):
   plt.plot(iterations, times, label="Total loss")
   
   #plt.savefig(img_file_name + '_time.png')
-  #print('Saved time figure to drive.')
-  logger.info('Saved time figure to drive.')
+  print('Saved time figure to drive.')
   plt.tight_layout()
   plt.show()
 
@@ -477,9 +472,8 @@ def show_results(best_img, content_path, style_path, show_large_final=True):
 def save_image(best_img, path):
   best_img = best_img.astype('uint8')
   img = Image.fromarray(best_img)
-  img.save(path + '.png')
-  #print('Saved image to drive.')
-  logger.info('Saved image to drive.')
+  img.save(path)
+  print('Saved image to drive.')
 
 
 # In[43]:
@@ -502,8 +496,7 @@ def save_config(total_losses, style_losses, content_losses, iterations, times, i
 
   with open(image_path + '_cfg.txt', 'w') as file:
     file.write(str(output_conf))
-  #print('Saved config to cloud drive.')
-  logger.info('Saved config to cloud drive.')
+  print('Saved config to cloud drive.')
 
 
 # ### Optimization method
@@ -513,6 +506,7 @@ def save_config(total_losses, style_losses, content_losses, iterations, times, i
 
 def run_style_transfer(content_path, 
                        style_path,
+                       result_path,
                        model_name=VGG16,
                        num_iterations=100,
                        content_weight=1e3, 
@@ -532,10 +526,9 @@ def run_style_transfer(content_path,
     elif model_name==VGG16:
       prp_type = vgg16_prp
     else:
-      logger.exception("Unsupported model architecture.")
-      raise
+      raise TypeError("Unsupported model architecture.")
      
-    model = get_model(model_name, inception) 
+    model, name = get_model(model_name, inception) 
     # print(model)
     for layer in model.layers:
         layer.trainable = False
@@ -565,8 +558,8 @@ def run_style_transfer(content_path,
     }
 
     # For displaying
-    num_rows = 5
-    num_cols = 5
+    num_rows = 2
+    num_cols = 1
     display_interval = num_iterations/(num_rows*num_cols)
     start_time = time.time()
     global_start = time.time()
@@ -630,8 +623,10 @@ def run_style_transfer(content_path,
                 'Style loss: {:.4e}, '
                 'Content loss: {:.4e}, '
                 'Time: {:.4f}s'.format(loss, style_score, content_score, time.time() - start_time))
-        
+     
+    total_time = '{:.4f}s'.format(time.time() - global_start)
     print('Total time: {:.4f}s'.format(time.time() - global_start))
+    
     
     # Uncomment these lines to save the results to your Google Drive (you first need to have it mounted)
     #save_image(best_img, cfg_path + image_title)
@@ -653,41 +648,21 @@ def run_style_transfer(content_path,
     plt.show()
 	'''
 
-    unique_name = str(uuid.uuid4()) + ".png"
-    result_path = "static/images/output/" + unique_name
     save_image(best_img, result_path)
 
     result_dict = {
         'image': best_img,
         'total_losses': total_losses,
         'content_losses': content_losses,
+        'style_losses': style_losses,
         'iterations': iterations,
         'times': times,
-        'name': unique_name
+        'total_time': total_time,
+        'model_name': name,
+        'gen_image_width': best_img.shape[0],
+        'gen_image_height': best_img.shape[1]
     }
     
-    return result_dict
-
-
-# ### Run tests
-
-def run_model(content_image_path, style_image_path):
- 
-    params = {
-        'content_image' : content_image_path,
-        'style_image' : style_image_path,
-        'model_name' : VGG16,
-        'num_iterations' : 100,
-        'content_weight':1e3, 
-        'style_weight':1e-2,
-        'lr':5,
-        'beta1':0.99,
-        'epsilon':1e-1,
-        'cfg_path':'static/images/output/graphs/'
-    }
-
-    result_dict = run_style_transfer(**params)
-    gc.collect()
     return result_dict
 
 # In[51]:

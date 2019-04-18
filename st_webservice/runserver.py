@@ -1,7 +1,7 @@
 """
 This script runs the st_webservice application using a development server.
 """
-
+import os
 from os import environ
 from st_webservice import app
 
@@ -11,4 +11,7 @@ if __name__ == '__main__':
         PORT = int(environ.get('SERVER_PORT', '5555'))
     except ValueError:
         PORT = 5555
+
+    app.secret_key = os.urandom(16)
+    app.debug = True
     app.run(HOST, PORT)

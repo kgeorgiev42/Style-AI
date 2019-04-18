@@ -1,0 +1,162 @@
+﻿{% extends "layout.html" %}
+
+{% block results %}
+
+<section id="about">
+    <div class="container-fluid">
+        <div class="section-header">
+            <h3 class="section-title">Style AI Results</h3>
+            <span class="section-divider"></span>
+            <p class="section-description">
+                The following image was successfully generated.
+            </p>
+        </div>
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="container text-center">
+                    <div class="row">
+                        <div class="container text-center">
+                            <label>Content Image</label>
+                        </div>
+                    </div>
+                    <img src={{content_path}} alt="content" style="height: auto; width: 100%">
+
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="container text-center">
+                    <div class="row">
+                        <div class="container text-center">
+                            <label>Generated Image</label>
+                        </div>
+                    </div>
+                    <img src={{result_path}} style="height: auto; width: 100%" alt="result">
+
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="container text-center">
+                    <div class="row">
+                        <div class="container text-center">
+                            <label>Style Image</label>
+                        </div>
+                    </div>
+                    <img src={{style_path}} alt="style" style="height: auto; width: 100%">
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+</section><!-- #about -->
+
+
+<section id="about">
+    <div class="container-fluid">
+        <div class="section-header">
+            <h3 class="section-title">Model statistics</h3>
+            <span class="section-divider"></span>
+            <p class="section-description">
+                Information about the input parameters and model performance.
+            </p>
+        </div>
+        <div class="row">
+            <div class="table-responsive col-lg-6">
+                <table class="table">
+                    <thead class="text-center">
+                        <tr>
+                            <th scope="col"><b>Input parameters</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Model name:</th>
+                            <td class="text-center">{{model_name}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Iterations:</th>
+                            <td class="text-center">{{num_iterations}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Content weight:</th>
+                            <td class="text-center">{{content_weight}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Style weight:</th>
+                            <td class="text-center">{{style_weight}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Learning rate:</th>
+                            <td class="text-center">{{lr}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Beta:</th>
+                            <td class="text-center">{{beta1}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Epsilon:</th>
+                            <td class="text-center">{{epsilon}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-responsive col-lg-6">
+                <table class="table">
+                    <thead class="text-center">
+                        <tr>
+                            <th scope="col"><b>Model performance</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Total time:</th>
+                            <td class="text-center">{{total_time}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Total loss:</th>
+                            <td class="text-center">{{total_loss}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Style loss:</th>
+                            <td class="text-center">{{style_loss}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Content loss:</th>
+                            <td class="text-center">{{content_loss}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Generated image width:</th>
+                            <td class="text-center">{{gen_image_width}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Generated image height:</th>
+                            <td class="text-center">{{gen_image_height}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+
+
+</section><!-- #about -->
+
+<section id="call-to-action">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-9 text-center text-lg-left">
+                <h3 class="cta-title">Create more images</h3>
+            </div>
+            <div class="col-lg-3 cta-btn-container text-center">
+                <a class="cta-btn align-middle" href="{{ url_for('style') }}">Generate again</a>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

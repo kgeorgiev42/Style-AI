@@ -12,41 +12,113 @@
             </p>
         </div>
 
-        <div class="row">
-            <div class="col-lg-7 content wow fadeInLeft">
+        <form action="" method="post" role="form" id="upload-form"  enctype="multipart/form-data">
+
+            <div class="row">
                 <div class="container-fluid">
-                    <form action="" method="post" role="form" class="contactForm" style="margin: 0 auto;">
-                        <h2 class="text-center">Upload your images</h2>
+                    <h2 class="text-center">Upload your images</h2>
+                </div>
+                <div class="col-lg-6 content wow fadeInLeft">
+                    <div class="container-fluid">
                         <div class="form-row">
-                            <div class="form-group col-lg-8">
-                                <h4>Content File</h4>
-                                <input type="file" name=content-file class="form-control" />
-                                <div class="validation"></div>
+                            <div class="form-group col-lg-11">
+                                <label class="text-center">Content Image</label>
+                                <div class="input-group">
+                                    <input type="text" name="content-file-name" class="form-control" readonly>
+
+                                    <div class="input-group-btn col-lg-12 text-center">
+                                        <span class="btn btn-default btn-file">
+                                            Browse… <input type="file" name="content-file" id="imgInpContent" required>
+                                        </span>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-lg-8">
-                                <h4>Style File</h4>
-                                <input type="file" name=style-file class="form-control" />
-                                <div class="validation"></div>
+
+                            <div class="form-group col-lg-11 text-center">
+                                <div id="val_message_cont"></div>
+                                <img id='img-upload-content' class="img-fluid" style="height: auto; width: 100%"/>
                             </div>
                         </div>
-                        <div class="col-lg-8 content wow fadeInLeft">
-                            <div class="cta-btn-container text-center"><button class="btn btn-outline btn-xl" data-loading-text="Loading..." type="submit" title="Upload images" onclick="loading();">Upload</button></div>
-                            </div>
-                    </form>
+
                     </div>
                 </div>
 
+                <div class="col-lg-6 col-offset-6 centered content wow fadeInLeft ">
+                    <div class="container-fluid">
+                        <div class="form-row">
+                            <div class="form-group col-lg-11">
+                                <label class="text-center">Style Image</label>
+                                <div class="input-group">
+                                    <input type="text" name="style-file-name" class="form-control" readonly>
+                                    <div class="input-group-btn col-lg-12 text-center">
+                                        <span class="btn btn-default btn-file">
+                                            Browse… <input type="file" name="style-file" id="imgInpStyle" required>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-lg-11 text-center">
+                                <div id="val_message_style"></div>
+                                <img id='img-upload-style' class="img-fluid" style="height: auto; width: 100%"/>
+                            </div>
+                        </div>
 
-            <div class="col-lg-5 about-img wow fadeInRight">
-                <div class="container-fluid" style="margin-top:20px;">
-                    <img src="../static/img/gallery/gallery-4.jpg" alt="">
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-lg-3"></div>
+                <div class="content wow fadeInLeft col-lg-6">
+                    <div class="cta-btn-container text-center">
+                        <button class="btn btn-outline btn-xl btn-block" id="load" type="submit">
+                            Generate
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-3"></div>
+            </div>
+
+            <div class="row">
+                <div class="container text-center">
+                    <h4 class="err-mes" style="margin: 20px auto; color:darkorange">{{message}}</h4>
                 </div>
             </div>
 
+            <div class="row">
+
+                <h6 style="display: block; margin: 20px auto;">
+                    Warning: This may take a few minutes to process.
+                </h6>
+            </div>
+            <div class="row">
+                <img src="../static/img/loading.gif" id="gif" style="display: block; margin: 20px auto; width: 100px; visibility: hidden;">
+            </div>
+        </form>
+
+    </div>
+
+
+
+</section><!-- #about -->
+
+
+<section id="call-to-action">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-9 text-center text-lg-left">
+                <h3 class="cta-title">Back to home page</h3>
+            </div>
+            <div class="col-lg-3 cta-btn-container text-center">
+                <a class="cta-btn align-middle" href="{{ url_for('home') }}">Back</a>
+            </div>
         </div>
 
     </div>
-</section><!-- #about -->
+</section>
 {% endblock %}
