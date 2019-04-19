@@ -30,7 +30,7 @@
                             <label>Generated Image</label>
                         </div>
                     </div>
-                    <img src={{result_path}} style="height: auto; width: 100%" alt="result">
+                    <img id="result" src={{result_path}} style="height: auto; width: 100%" alt="result">
 
                 </div>
             </div>
@@ -43,6 +43,40 @@
                     </div>
                     <img src={{style_path}} alt="style" style="height: auto; width: 100%">
                 </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top:20px;">
+            <div class="container text-center">
+                <form>
+                    <h3 class="section-title">Export your result</h3>
+
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" class="custom-control-input" id="jpg_rad" name="export" value="customEx">
+                        <label class="custom-control-label" for="jpg_rad">JPG</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" class="custom-control-input" id="png_rad" name="export" value="customEx">
+                        <label class="custom-control-label" for="png_rad">PNG</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" class="custom-control-input" id="bmp_rad" name="export" value="customEx">
+                        <label class="custom-control-label" for="bmp_rad">BMP</label>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-group-btn col-lg-12 text-center">
+                <span class="btn btn-default btn-file" id="export_btn">
+                    Export
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="container text-center">
+                <h4 class="exp-mes" style="margin: 20px auto; color:darkorange">{{message}}</h4>
             </div>
         </div>
 
@@ -137,6 +171,31 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="container text-center">
+                    <div class="row">
+                        <div class="container text-center">
+                            <label><b>Model learning curve</b></label>
+                        </div>
+                    </div>
+                    <img id="loss" src={{loss_path}} style="height: auto; width: 100%" alt="result">
+
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="container text-center">
+                    <div class="row">
+                        <div class="container text-center">
+                            <label><b>Execution time</b></label>
+                        </div>
+                    </div>
+                    <img id="execution" src={{exec_path}} style="height: auto; width: 100%" alt="result">
+
+                </div>
             </div>
         </div>
 

@@ -22,7 +22,7 @@ OUTPUT_IMAGE_FORMAT = '.png'
 
 MODEL_PARAMS = {
         'model_name' : VGG16,
-        'num_iterations' : 100,
+        'num_iterations' : 300,
         'content_weight':1e3, 
         'style_weight':1e-2,
         'lr':5,
@@ -77,7 +77,7 @@ def style():
         content_name = generate_image_filename()
         style_name = generate_image_filename()
         result_name = generate_image_filename()
-        _, file_extension = os.path.splitext(result_name)
+        result_file_name, file_extension = os.path.splitext(result_name)
         file_names = [content_name, style_name]
 
         for i, file in enumerate(files):
@@ -107,6 +107,8 @@ def style():
         MODEL_PARAMS['content_path'] = "st_webservice/static/images/upload/content/" + file_names[0];
         MODEL_PARAMS['style_path'] = "st_webservice/static/images/upload/style/" + file_names[1];
         MODEL_PARAMS['result_path'] = "st_webservice/static/images/output/images/" + result_name;
+        MODEL_PARAMS['loss_path'] = "st_webservice/static/images/output/graphs/" + result_file_name + "_loss" + file_extension;
+        MODEL_PARAMS['exec_path'] = "st_webservice/static/images/output/graphs/" + result_file_name + "_time" + file_extension;
         
         app.logger.info('Initiating style transfer model..')
 
@@ -128,6 +130,8 @@ def style():
             'content_path': "../static/images/upload/content/" + file_names[0],
             'style_path': "../static/images/upload/style/" + file_names[1],
             'result_path': "../static/images/output/images/" + result_name,
+            'loss_path': "../static/images/output/graphs/" + result_file_name + "_loss" + file_extension,
+            'exec_path': "../static/images/output/graphs/" + result_file_name + "_time" + file_extension,
         });
 
 

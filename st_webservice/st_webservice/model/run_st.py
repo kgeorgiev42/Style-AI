@@ -110,7 +110,7 @@ style_image_path = "test_images/style/K5Vd72D.jpg"
 # In[12]:
 
 
-def read_image(src, img_w=512, img_h=512):
+def read_image(src, img_w=256, img_h=256):
   
     img = Image.open(src)
     
@@ -392,7 +392,7 @@ def compute_gradients(cfg):
 
 def plot_learning_curve(iterations, total_losses, style_losses, content_losses, img_file_name):
   
-  plt.figure(figsize=(10, 10))
+  plt.figure(figsize=(8, 8))
   
   plt.xlabel('Iterations')
   plt.ylabel('Losses')
@@ -425,10 +425,10 @@ def plot_learning_curve(iterations, total_losses, style_losses, content_losses, 
   ax[1].legend()
   '''
   
-  #plt.savefig(img_file_name + '_loss.png')
+  plt.savefig(img_file_name)
   print('Saved loss figure to drive.')
-  plt.tight_layout()
-  plt.show()
+  #plt.tight_layout()
+  #plt.show()
 
 
 # In[29]:
@@ -441,12 +441,12 @@ def plot_time(iterations, times, img_file_name):
   plt.xlabel("Iterations")
   plt.ylabel("Time (s)")
   
-  plt.plot(iterations, times, label="Total loss")
+  plt.plot(iterations[1:], times[1:], label="Time")
   
-  #plt.savefig(img_file_name + '_time.png')
+  plt.savefig(img_file_name)
   print('Saved time figure to drive.')
-  plt.tight_layout()
-  plt.show()
+  #plt.tight_layout()
+  #plt.show()
 
 
 # ### Display results
@@ -507,8 +507,10 @@ def save_config(total_losses, style_losses, content_losses, iterations, times, i
 def run_style_transfer(content_path, 
                        style_path,
                        result_path,
+                       loss_path,
+                       exec_path,
                        model_name=VGG16,
-                       num_iterations=100,
+                       num_iterations=300,
                        content_weight=1e3, 
                        style_weight=1e-2,
                        lr=5,
@@ -558,12 +560,12 @@ def run_style_transfer(content_path,
     }
 
     # For displaying
-    num_rows = 2
-    num_cols = 1
+    num_rows = 5
+    num_cols = 5
     display_interval = num_iterations/(num_rows*num_cols)
     start_time = time.time()
     global_start = time.time()
-
+    
     norm_means = np.array([103.939, 116.779, 123.68])
     min_vals = -norm_means
     max_vals = 255 - norm_means   
@@ -580,21 +582,22 @@ def run_style_transfer(content_path,
     times = []
     
     
-    
+    start_time = time.time()
+
     for i in range(num_iterations):
+        
+
         grads, all_loss = compute_gradients(cfg)
         loss, style_score, content_score = all_loss
         opt.apply_gradients([(grads, init_image)])
         clipped = tf.clip_by_value(init_image, min_vals, max_vals)
         init_image.assign(clipped)
-        end_time = time.time() 
 
         if loss < best_loss:
             best_loss = loss
             best_img = deprocess_img(init_image.numpy(), inception=inception)
 
         if i % display_interval == 0:
-            start_time = time.time()
 
             plot_img = init_image.numpy()
             plot_img = deprocess_img(plot_img, inception=inception)
@@ -623,6 +626,8 @@ def run_style_transfer(content_path,
                 'Style loss: {:.4e}, '
                 'Content loss: {:.4e}, '
                 'Time: {:.4f}s'.format(loss, style_score, content_score, time.time() - start_time))
+
+            start_time = time.time()
      
     total_time = '{:.4f}s'.format(time.time() - global_start)
     print('Total time: {:.4f}s'.format(time.time() - global_start))
@@ -649,6 +654,9 @@ def run_style_transfer(content_path,
 	'''
 
     save_image(best_img, result_path)
+
+    plot_learning_curve(iterations, total_losses, style_losses, content_losses, loss_path)
+    plot_time(iterations, times, exec_path)
 
     result_dict = {
         'image': best_img,

@@ -134,6 +134,9 @@
     <!-- Template Main Javascript File -->
     <script src="../static/js/main.js"></script>
 
+    <!-- Custom scripts -->
+    <script src="../static/js/download.js"></script>
+
 
     <script type="text/javascript">
         $(document).ready(function () {
@@ -204,11 +207,40 @@
             $("#upload-form").submit(function () {
                 if ($('#val_message_style').text() == "" && $('#val_message_text').text() == "") {
                     $('#load').text('Generating image..');
+                    $('#load').attr('disabled', 'disabled');
                     $('#gif').css('visibility', 'visible');
                     $('.err-mes').text('');
                     return true;
                 }
                 return false;
+            });
+
+            $('#export_btn').click(function () {
+                var src = $('#result').attr('src'); 
+                var tarr = src.split('/');     
+                var file = tarr[tarr.length - 1]; 
+                var data = file.split('.')[0]; 
+                var link = document.createElement('a');
+                link.setAttribute('href', src);
+                if ($('#jpg_rad').is(':checked')) {
+                    link.setAttribute('download', data + ".jpg");
+                }
+                else if ($('#png_rad').is(':checked')) {
+                    link.setAttribute('download', data + ".png");
+                }
+                else if ($('#bmp_rad').is(':checked')) {
+                    link.setAttribute('download', data + ".bmp");
+                }
+                else {
+                    $('.exp-mes').text('Please select a format.');
+                    return;
+                }
+
+                link.setAttribute('target', '_blank');
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             });
 
         });
