@@ -1,0 +1,65 @@
+﻿{% extends "layout.html" %}
+
+{% block login %}
+
+<section id="about">
+    <div class="container-fluid">
+        <div id="logreg-forms">
+            <form class="form-signin" method="post">
+                <h3 style="text-align: center; margin:auto;"> Sign in</h3>
+                <hr />
+                <div class="text-center" style="margin-top:10px; margin-bottom:10px;">
+                    {% for message in get_flashed_messages() %}
+                    {{ message }}
+                    {% endfor %}
+                </div>
+
+                <div class="social-login">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <button class="btn facebook-btn social-btn" type="button"><span><i class="fab fa-facebook-f"></i> Sign in with Facebook</span> </button>
+                        </div>
+                        <div class="col-lg-4">
+                            <button class="btn twitter-btn social-btn" type="button"><span><i class="fab fa-twitter"></i> Sign in with Twitter</span> </button>
+                        </div>
+                        <div class="col-lg-4">
+                            <button class="btn github-btn social-btn" type="button"><span><i class="fab fa-github"></i> Sign in with Github</span> </button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <p style="text-align:center"> OR  </p>
+                <input type="text" id="inpUser" class="form-control" placeholder="Username" required="" autofocus="" name="log_username" style="margin-top:10px;">
+                <input type="password" id="inputPassword" class="form-control" placeholder="Password" required="" name="log_password" style="margin-top:10px;">
+
+
+
+                <div class="form-check" style="margin-top:10px;">
+                    <input type="checkbox" class="form-check-input" id="exampleCheck1" name="remember_me">
+                    <label class="form-check-label" for="exampleCheck1" name="log_remember">Remember me</label>
+                </div>
+
+                {% if error %}
+                <p class="error" style="color:orangered; margin-top:10px;"><strong>Error:</strong> {{ error }}</p>
+                {% endif %}
+
+                <button class="btn btn-success btn-block" type="submit" name="submit_log"><i class="fas fa-sign-in-alt"></i> Sign in</button>
+                <a href="{{ url_for('reset_pwd') }}" id="forgot_pswd">Forgot password?</a>
+                <hr>
+                <!-- <p>Don't have an account!</p>  -->
+                <button class="btn btn-primary btn-block" type="button" id="btn-signup"><i class="fas fa-user-plus"></i> Sign up New Account</button>
+            </form>
+
+            
+
+            <br>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+{% endblock %}

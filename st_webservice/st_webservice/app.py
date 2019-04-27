@@ -4,12 +4,8 @@ import os
 from flask import (Flask, flash, redirect, render_template, request,
 send_from_directory, url_for)
 
-from st_webservice.model.run_st import run_model
 
-import st_webservice.views
-
-
-app = Flask(__name__)
+from st_webservice import app, views, models
 
 
 @app.after_request

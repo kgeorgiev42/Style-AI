@@ -7,6 +7,12 @@
         <div class="section-header">
             <h3 class="section-title">Create art with Style AI</h3>
             <span class="section-divider"></span>
+
+            <div class="text-center">
+                {% if current_user.is_authenticated %}
+                <li class="navbar-brand logo" role="presentation"><h4>Hi, {{ current_user.username }}</h4></li>
+                {% endif %}
+            </div>
             <p class="section-description">
                 Import custom content and style images and mix them to create the perfect painting.
             </p>

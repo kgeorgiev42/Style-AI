@@ -4,28 +4,34 @@
 <section id="intro">
 
     <div class="intro-text">
-        <h2>Style Transfer Web Service</h2>
-        <p>Create artistic images using Deep Learning. No talent required!</p>
-        <br>
-        <p>Here are some generated examples.</p>
-        <!--<a href="#about" class="btn-get-started scrollto">Get Started</a>-->
-    </div>
 
-    <div class="product-screens">
-
-        <div class="product-screen-1 wow fadeInUp" data-wow-delay="0.4s" data-wow-duration="0.6s">
-            <img src="../static/img/neil.png" alt="">
+        <div class="text-center" style="margin-top:30px;">
+            {% if message %}
+            <p class="error" style="color:darkgray; margin-top:10px;"><strong>Info:</strong> {{ message }}</p>
+            {% endif %}
+        </div>
+            <h2>Style Transfer Web Service</h2>
+            <p>Create artistic images using Deep Learning. No talent required!</p>
+            <br>
+            <p>Here are some generated examples.</p>
+            <!--<a href="#about" class="btn-get-started scrollto">Get Started</a>-->
         </div>
 
-        <div class="product-screen-2 wow fadeInUp" data-wow-delay="0.2s" data-wow-duration="0.6s">
-            <img src="../static/img/pelican.png" alt="">
-        </div>
+        <div class="product-screens">
 
-        <div class="product-screen-3 wow fadeInUp" data-wow-duration="0.6s">
-            <img src="../static/img/scenery.png" alt="">
-        </div>
+            <div class="product-screen-1 wow fadeInUp" data-wow-delay="0.4s" data-wow-duration="0.6s">
+                <img src="../static/img/neil.png" alt="">
+            </div>
 
-    </div>
+            <div class="product-screen-2 wow fadeInUp" data-wow-delay="0.2s" data-wow-duration="0.6s">
+                <img src="../static/img/pelican.png" alt="">
+            </div>
+
+            <div class="product-screen-3 wow fadeInUp" data-wow-duration="0.6s">
+                <img src="../static/img/scenery.png" alt="">
+            </div>
+
+        </div>
 </section>
     {% endblock %}
 
@@ -33,6 +39,18 @@
 
     <section id="call-to-action">
         <div class="container">
+            <div class="row">
+                <hr>
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                    <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% endwith %}
+            </div>
             <div class="row">
                 <div class="col-lg-9 text-center text-lg-left">
                     <h3 class="cta-title">Get Started</h3>

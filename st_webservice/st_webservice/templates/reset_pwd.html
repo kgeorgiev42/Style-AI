@@ -1,0 +1,18 @@
+﻿{% extends "layout.html" %}
+
+{% block register %}
+
+<section id="about">
+    <div class="container-fluid">
+        <div id="logreg-forms">
+            <div class="form">
+
+                <form action="/reset/password/" form class="form-signin" name="form-signin">
+                    <input type="email" id="resetEmail" class="form-control" placeholder="Email address" required="" autofocus="">
+                    <button class="btn btn-primary btn-block" type="submit">Reset Password</button>
+                    <a href="{{ url_for('login') }}" id="cancel_reset"><i class="fas fa-angle-left"></i> Back</a>
+                </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

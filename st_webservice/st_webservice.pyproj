@@ -32,8 +32,17 @@
     <Compile Include="st_webservice\app.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="st_webservice\config.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="st_webservice\models.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="st_webservice\model\run_st.py" />
     <Compile Include="st_webservice\model\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="st_webservice\forms.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="st_webservice\utils.py">
@@ -162,6 +171,9 @@
     <Content Include="st_webservice\static\lib\wow\wow.min.js" />
     <Content Include="st_webservice\templates\gallery.html" />
     <Content Include="st_webservice\templates\index.html" />
+    <Content Include="st_webservice\templates\login.html" />
+    <Content Include="st_webservice\templates\register.html" />
+    <Content Include="st_webservice\templates\reset_pwd.html" />
     <Content Include="st_webservice\templates\results.html" />
     <Content Include="st_webservice\templates\start.html" />
     <Content Include="st_webservice\templates\style.html" />

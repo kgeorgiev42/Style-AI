@@ -12,6 +12,5 @@ if __name__ == '__main__':
     except ValueError:
         PORT = 5555
 
-    app.secret_key = os.urandom(16)
     app.debug = True
     app.run(HOST, PORT)

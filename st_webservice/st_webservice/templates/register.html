@@ -1,0 +1,35 @@
+﻿{% extends "layout.html" %}
+
+{% block register %}
+
+<section id="about">
+    <div class="container-fluid">
+        <div id="logreg-forms">
+            <div class="form minimal">
+
+                <div id="errormessage"></div>
+                <form class="form-signin" name="form-signin" method="post">
+                    <h3 style="text-align: center;">Create a new account</h3>
+                    <hr />
+
+                    <input type="text" id="user-name" class="form-control" placeholder="Username: (must be between 8 and 20 characters)" pattern="^[a-zA-Z][a-zA-Z0-9-_\.]{8,20}$" required="" autofocus="" name="reg_username" style="margin-top:10px;">
+                    <input type="email" id="user-email" class="form-control" placeholder="Email address:" required autofocus="" name="reg_email" style="margin-top:10px;">
+                    <input type="password" id="user-pass" class="form-control" placeholder="Password: (must contain 1 uppercase, lowercase and number)" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" required autofocus="" name="reg_password" style="margin-top:10px;">
+                    <input type="password" id="user-repeatpass" class="form-control" placeholder="Repeat Password" required autofocus="" name="reg_rpassword" style="margin-top:10px;">
+
+                    {% if error %}
+                    <p class="error" style="color:orangered; margin-top:10px;"><strong>Error:</strong> {{ error }}</p>
+                    {% endif %}
+                    {% for message in get_flashed_messages() %}
+                    {{ message }}
+                    {% endfor %}
+
+                    <button class="btn btn-primary btn-block btn-minimal" type="submit" name="submit_reg"><i class="fas fa-user-plus"></i> Sign Up</button>
+
+                    <a href="{{ url_for('login') }}" id="cancel_signup"><i class="fas fa-angle-left"></i> Back</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

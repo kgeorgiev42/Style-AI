@@ -55,10 +55,18 @@
 
             <nav id="nav-menu-container">
                 <ul class="nav-menu">
+                    {% if current_user.is_anonymous %}
+                    <li class="menu-active"><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
+                    <li><a href="{{ url_for('about') }}">About</a></li>
+                    {% else %}
                     <li class="menu-active"><a href="{{ url_for('home') }}">Home</a></li>
                     <li><a href="{{ url_for('style') }}">Style</a></li>
                     <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
                     <li><a href="{{ url_for('about') }}">About</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    {% endif %}
                 </ul>
             </nav>
         </div>
@@ -68,7 +76,7 @@
 
 
     <main id="main">
-
+        
         {% block index %}{% endblock %}
         {% block start %}{% endblock %}
         {% block about %}{% endblock %}
@@ -76,6 +84,8 @@
         {% block gallery %}{% endblock %}
         {% block style %}{% endblock %}
         {% block results %}{% endblock %}
+        {% block login %}{% endblock %}
+        {% block register %}{% endblock %}
 
 
 
@@ -241,6 +251,10 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+            });
+
+            $('#btn-signup').click(function () {
+                window.location = "register";
             });
 
         });
