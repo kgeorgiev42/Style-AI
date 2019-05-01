@@ -13,9 +13,9 @@ class Config(object):
         'id': '324757018187796',
         'secret': 'ab3a308041765a67d3ea7244c66c245a'
     },
-    'twitter': {
-        'id': '8dDlxj8ZvsO39AEugS3vwNmwc',
-        'secret': 'msep66HBgmjfL7JArjA8CHd0jgO7q6cVKL4ce9eWxn9mlzXdEv'
+    'google': {
+        'id': '1079434338675-eo84kf8cta3gcs688fp0tnk3f28j47eo.apps.googleusercontent.com',
+        'secret': 'pUnbhL12msJv9FqKGcL9YJKv'
     },
     'github': {
         'id': 'b00648d6adf8b0b7c955',

@@ -1,5 +1,7 @@
 
 import json
+import urllib3
+from bs4 import BeautifulSoup
 from rauth import OAuth2Service, OAuth1Service
 from flask import current_app, url_for, request, redirect, session
 
@@ -43,11 +45,12 @@ class FacebookSignIn(OAuthSignIn):
             base_url='https://graph.facebook.com/')
 
     def authorize(self):
-        print(self.get_callback_url())
+        url = str(self.get_callback_url())
+        url = url.replace("http://", "https://")
         return redirect(self.service.get_authorize_url(
                 scope='email',
                 response_type='code',
-                redirect_uri=self.get_callback_url()))
+                redirect_uri=url))
 
     def callback(self):
         def decode_json(payload):
@@ -56,10 +59,12 @@ class FacebookSignIn(OAuthSignIn):
         if 'code' not in request.args:
             return None, None, None
 
+        url = str(self.get_callback_url())
+        url = url.replace("http://", "https://")
         oauth_session = self.service.get_auth_session(
             data={'code': request.args['code'],
                   'grant_type': 'authorization_code',
-                  'redirect_uri': self.get_callback_url()},
+                  'redirect_uri': url},
             decoder=decode_json
         )
         me = oauth_session.get('me?fields=id,name,email').json()
@@ -67,44 +72,6 @@ class FacebookSignIn(OAuthSignIn):
         username = me['name']
         email = me.get('email', None)
         return (social_id, username, email)
-
-
-class TwitterSignIn(OAuthSignIn):
-    def __init__(self):
-        super(TwitterSignIn, self).__init__('twitter')
-        self.service = OAuth1Service(
-            name='twitter',
-            consumer_key=self.consumer_id,
-            consumer_secret=self.consumer_secret,
-            request_token_url='https://api.twitter.com/oauth/request_token',
-            authorize_url='https://api.twitter.com/oauth/authorize',
-            access_token_url='https://api.twitter.com/oauth/access_token',
-            base_url='https://api.twitter.com/1.1/'
-        )
-
-    def authorize(self):
-        def new_decoder(payload):
-            return json.loads(payload.decode('utf-8'))
-        request_token = self.service.get_request_token(
-            params={'oauth_callback': self.get_callback_url()},
-        )
-        session['request_token'] = request_token
-        return redirect(self.service.get_authorize_url(request_token[0]))
-
-    def callback(self):
-        request_token = session.pop('request_token')
-        if 'oauth_verifier' not in request.args:
-            return None, None, None
-        oauth_session = self.service.get_auth_session(
-            request_token[0],
-            request_token[1],
-            data={'oauth_verifier': request.args['oauth_verifier']}
-        )
-        me = oauth_session.get('account/verify_credentials.json').json()
-        social_id = 'twitter$' + str(me.get('id'))
-        username = me.get('screen_name')
-        
-        return social_id, username, None # Twitter does not provide email
 
 class GithubSignIn(OAuthSignIn):
     def __init__(self):
@@ -127,12 +94,56 @@ class GithubSignIn(OAuthSignIn):
     def callback(self):
         if 'code' not in request.args:
             return None, None, None
-
+        
         oauth_session = self.service.get_auth_session(
-            data={'code': request.args['code'],
-                  'redirect_uri': self.get_callback_url()}
+            data={'code': request.args['code']}
         )
         me = oauth_session.get('user').json()
         social_id = 'github$' + str(me['id'])
         username = me.get('name')
         return social_id, username, None
+
+class GoogleSignIn(OAuthSignIn):
+    def __init__(self):
+        super(GoogleSignIn, self).__init__('google')
+        response = urllib3.PoolManager().request('GET', 'https://accounts.google.com/.well-known/openid-configuration')
+        google_params = json.loads(response.data.decode('utf-8'))
+        self.service = OAuth2Service(
+                name='google',
+                client_id=self.consumer_id,
+                client_secret=self.consumer_secret,
+                authorize_url=google_params.get('authorization_endpoint'),
+                base_url=google_params.get('userinfo_endpoint'),
+                access_token_url=google_params.get('token_endpoint')
+        )
+
+    def authorize(self):
+        url = str(self.get_callback_url())
+        url = url.replace("http://", "https://")
+        return redirect(self.service.get_authorize_url(
+            scope='email',
+            response_type='code',
+            redirect_uri=url)
+            )
+
+    def callback(self):
+        def decode_json(payload):
+            return json.loads(payload.decode('utf-8'))
+
+        if 'code' not in request.args:
+            return None, None, None
+
+        url = str(self.get_callback_url())
+        url = url.replace("http://", "https://")
+        oauth_session = self.service.get_auth_session(
+                data={'code': request.args['code'],
+                      'grant_type': 'authorization_code',
+                      'redirect_uri': url
+                     },
+                decoder = decode_json
+        )
+        me = oauth_session.get('').json()
+        social_id = 'google$' + me['sub']
+        return (social_id,
+                me.get('email').split('@')[0],
+                me['email'])

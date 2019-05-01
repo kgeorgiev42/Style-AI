@@ -15,7 +15,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 
 from st_webservice.forms import LoginForm, RegistrationForm
-from st_webservice.models import User, db
+from st_webservice.models import User, UserAuth, db
 from st_webservice.auth import OAuthSignIn
 
 UPLOAD_CONTENT_FOLDER = 'st_webservice/static/images/upload/content/'
@@ -110,9 +110,9 @@ def oauth_callback(provider):
     if social_id is None:
         flash('Authentication failed.')
         return redirect(url_for('login'))
-    user = User.query.filter_by(social_id=social_id).first()
+    user = UserAuth.query.filter_by(social_id=social_id).first()
     if not user:
-        user = User(social_id=social_id, username=username, email=email)
+        user = UserAuth(social_id=social_id, username=username, email=email)
         db.session.add(user)
         db.session.commit()
     login_user(user, True)
