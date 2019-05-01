@@ -16,6 +16,7 @@ from werkzeug.urls import url_parse
 
 from st_webservice.forms import LoginForm, RegistrationForm
 from st_webservice.models import User, db
+from st_webservice.auth import OAuthSignIn
 
 UPLOAD_CONTENT_FOLDER = 'st_webservice/static/images/upload/content/'
 UPLOAD_STYLE_FOLDER = 'st_webservice/static/images/upload/style/'
@@ -91,6 +92,31 @@ def login():
             next_page = url_for('style')
         return redirect(next_page)
     return render_template('login.html', title='Sign In')
+
+
+@app.route('/authorize/<provider>')
+def oauth_authorize(provider):
+    if not current_user.is_anonymous:
+        return redirect(url_for('style'))
+    oauth = OAuthSignIn.get_provider(provider)
+    return oauth.authorize()
+
+@app.route('/callback/<provider>')
+def oauth_callback(provider):
+    if not current_user.is_anonymous:
+        return redirect(url_for('style'))
+    oauth = OAuthSignIn.get_provider(provider)
+    social_id, username, email = oauth.callback()
+    if social_id is None:
+        flash('Authentication failed.')
+        return redirect(url_for('login'))
+    user = User.query.filter_by(social_id=social_id).first()
+    if not user:
+        user = User(social_id=social_id, username=username, email=email)
+        db.session.add(user)
+        db.session.commit()
+    login_user(user, True)
+    return redirect(url_for('style'))
         
 
 

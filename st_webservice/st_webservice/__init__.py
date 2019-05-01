@@ -16,5 +16,6 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 lm = LoginManager(app)
 lm.login_view = 'login'
+db.create_all()
 
 import st_webservice.views

@@ -32,6 +32,9 @@
     <Compile Include="st_webservice\app.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="st_webservice\auth.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="st_webservice\config.py">
       <SubType>Code</SubType>
     </Compile>
