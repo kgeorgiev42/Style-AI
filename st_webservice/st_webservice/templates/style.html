@@ -10,7 +10,11 @@
 
             <div class="text-center">
                 {% if current_user.is_authenticated %}
-                <li class="navbar-brand logo" role="presentation"><h4>Hi, {{ current_user.username }}</h4></li>
+                {% if current_user.is_oauth %}
+                <li class="navbar-brand logo" role="presentation"><h5>Currently logged in as {{ current_user.social_username }}</h5></li>
+                {% else %}
+                <li class="navbar-brand logo" role="presentation"><h5>Currently logged in as {{ current_user.username }}</h5></li>
+                {% endif %}
                 {% endif %}
             </div>
             <p class="section-description">

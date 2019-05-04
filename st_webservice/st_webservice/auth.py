@@ -1,7 +1,6 @@
 
 import json
 import urllib3
-from bs4 import BeautifulSoup
 from rauth import OAuth2Service, OAuth1Service
 from flask import current_app, url_for, request, redirect, session
 

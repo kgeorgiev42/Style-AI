@@ -15,7 +15,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 
 from st_webservice.forms import LoginForm, RegistrationForm
-from st_webservice.models import User, UserAuth, db
+from st_webservice.models import User, Image, db
 from st_webservice.auth import OAuthSignIn
 
 UPLOAD_CONTENT_FOLDER = 'st_webservice/static/images/upload/content/'
@@ -28,7 +28,7 @@ OUTPUT_IMAGE_FORMAT = '.png'
 
 MODEL_PARAMS = {
         'model_name' : VGG16,
-        'num_iterations' : 300,
+        'num_iterations' : 100,
         'content_weight':1e3, 
         'style_weight':1e-2,
         'lr':5,
@@ -106,13 +106,13 @@ def oauth_callback(provider):
     if not current_user.is_anonymous:
         return redirect(url_for('style'))
     oauth = OAuthSignIn.get_provider(provider)
-    social_id, username, email = oauth.callback()
+    social_id, social_username, social_email = oauth.callback()
     if social_id is None:
         flash('Authentication failed.')
         return redirect(url_for('login'))
-    user = UserAuth.query.filter_by(social_id=social_id).first()
+    user = User.query.filter_by(social_id=social_id).first()
     if not user:
-        user = UserAuth(social_id=social_id, username=username, email=email)
+        user = User(social_id=social_id, social_username=social_username, social_email=social_email, username=None, email=None)
         db.session.add(user)
         db.session.commit()
     login_user(user, True)
@@ -149,7 +149,7 @@ def register():
             error = 'Account with this email already exists.'
             return render_template('register.html', title='Register', error=error)
 
-        user = User(username=reg_username, email=reg_email)
+        user = User(social_id=None, social_username=None, social_email=None, username=reg_username, email=reg_email)
         user.set_password(reg_password)
         db.session.add(user)
         db.session.commit()
@@ -210,12 +210,12 @@ def style():
         
         app.logger.info('Initiating style transfer model..')
 
-        try:
-            result_dict = run_style_transfer(**MODEL_PARAMS)
-        except:
-            message = "Invalid image resolution. Dimensions must be even and divisible numbers(ex. 512x256)."
-            app.logger.error(message)
-            return render_template('style.html', message=message)
+        #try:
+        result_dict = run_style_transfer(**MODEL_PARAMS)
+        #except:
+           # message = "Invalid image resolution. Dimensions must be even and divisible numbers(ex. 512x256)."
+            #app.logger.error(message)
+           # return render_template('style.html', message=message)
 
         OUTPUT_PARAMS.update({
             'total_time': result_dict['total_time'],
@@ -231,6 +231,25 @@ def style():
             'loss_path': "../static/images/output/graphs/" + result_file_name + "_loss" + file_extension,
             'exec_path': "../static/images/output/graphs/" + result_file_name + "_time" + file_extension,
         });
+
+        if current_user.is_authenticated:
+            image = Image(
+                gen_image_path=OUTPUT_PARAMS['result_path'],
+                gen_image_width=OUTPUT_PARAMS['gen_image_width'],
+                gen_image_height=OUTPUT_PARAMS['gen_image_height'],
+                num_iters=OUTPUT_PARAMS['num_iterations'],
+                model_name=OUTPUT_PARAMS['model_name'],
+                total_loss=OUTPUT_PARAMS['total_loss'],
+                style_loss=OUTPUT_PARAMS['style_loss'],
+                content_loss=OUTPUT_PARAMS['content_loss'],
+                timestamp=datetime.utcnow(),
+                user_id=current_user.id
+                )
+            image.set_user(current_user)
+            db.session.add(image)
+            db.session.commit()
+
+            app.logger.info('Saved image to database.')
 
 
         #params_render = {

@@ -5,12 +5,22 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class User(UserMixin, db.Model):
     __tablename__ = 'users';
     id = db.Column(db.Integer, primary_key=True)           
-    email = db.Column(db.String(120), index=True, unique=True)
-    username = db.Column(db.String(120), index=True, unique=True)
+    email = db.Column(db.String(120), index=True, nullable=True, unique=True)
+    username = db.Column(db.String(120), index=True, nullable=True, unique=True)
     password_hash = db.Column(db.String(128))
+    social_id = db.Column(db.String(64), nullable=True, unique=True)
+    social_username = db.Column(db.String(64), nullable=True, index=True)
+    social_email = db.Column(db.String(120), nullable=True, index=True)
+    user_images = db.relationship('Image', backref='img_user', lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
+
+    @property
+    def is_oauth(self):
+        if self.social_id == None:
+            return False
+        return True
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -18,21 +28,28 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-class UserAuth(UserMixin, db.Model):      # for third-party oauth services
-    __tablename__ = 'auth_users';
-    id = db.Column(db.Integer, primary_key=True)           
-    social_id = db.Column(db.String(64), nullable=True, unique=True)
-    username = db.Column(db.String(64), index=True)
-    email = db.Column(db.String(120), index=True)
+
+class Image(db.Model):
+    __tablename__ = 'images';
+    id = db.Column(db.Integer, primary_key=True)
+    gen_image_path = db.Column(db.String(64))
+    gen_image_width = db.Column(db.Integer)
+    gen_image_height = db.Column(db.Integer)
+    num_iters = db.Column(db.Integer)
+    model_name = db.Column(db.String(64))
+    total_loss = db.Column(db.BigInteger)
+    style_loss = db.Column(db.BigInteger)
+    content_loss = db.Column(db.BigInteger)
+    timestamp = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def __repr__(self):
-        return '<Authenticated User {}>'.format(self.username)
+        return '<Image {}>'.format(self.id)
+
+    def set_user(self, user):
+        self.img_user = user
 
 
 @lm.user_loader
 def load_user(id):
     return User.query.get(int(id))
-
-@lm.user_loader
-def load_auth_user(id):
-    return UserAuth.query.get(int(id))

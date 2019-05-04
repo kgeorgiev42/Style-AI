@@ -12,7 +12,11 @@
 
             <div class="text-lg-left">
                 {% if current_user.is_authenticated %}
+                {% if current_user.is_oauth %}
+                <li class="navbar-brand logo" role="presentation"><h5>Currently logged in as {{ current_user.social_username }}</h5></li>
+                {% else %}
                 <li class="navbar-brand logo" role="presentation"><h5>Currently logged in as {{ current_user.username }}</h5></li>
+                {% endif %}
                 {% endif %}
             </div>
         </div>
