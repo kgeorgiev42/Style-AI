@@ -239,9 +239,9 @@ def style():
                 gen_image_height=OUTPUT_PARAMS['gen_image_height'],
                 num_iters=OUTPUT_PARAMS['num_iterations'],
                 model_name=OUTPUT_PARAMS['model_name'],
-                total_loss=OUTPUT_PARAMS['total_loss'],
-                style_loss=OUTPUT_PARAMS['style_loss'],
-                content_loss=OUTPUT_PARAMS['content_loss'],
+                total_loss=str(OUTPUT_PARAMS['total_loss']),
+                style_loss=str(OUTPUT_PARAMS['style_loss']),
+                content_loss=str(OUTPUT_PARAMS['content_loss']),
                 timestamp=datetime.utcnow(),
                 user_id=current_user.id
                 )
@@ -260,3 +260,32 @@ def style():
         
         return render_template('results.html', **OUTPUT_PARAMS)
     return render_template('style.html')
+
+@app.route('/user_images/<id>')
+@login_required
+def user_images(id):
+
+    user = User.query.filter_by(id=id).first()
+    if user is None:
+        flash('Authentication failed: User does not exist.')
+        return redirect(url_for('login'))
+
+    if user.user_images is None:
+        return render_template('user_images.html', message="No images to show.")
+
+    return render_template('user_images.html', images=user.user_images)
+
+@app.route('/user_images/<id>/<user_image_id>/popup')
+@login_required
+def user_stats(id, user_image_id):
+
+    user = User.query.filter_by(id=id).first()
+    if user is None:
+        flash('Authentication failed: User does not exist.')
+        return redirect(url_for('login'))
+
+    image = Image.query.filter_by(id=user_image_id).first()
+    if image is None:
+        return render_template('user_images.html', message="Undefined image.")
+
+    return render_template('user_stats.html', user_image=image)

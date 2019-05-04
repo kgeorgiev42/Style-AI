@@ -63,7 +63,8 @@
                     {% else %}
                     <li class="menu-active"><a href="{{ url_for('home') }}">Home</a></li>
                     <li><a href="{{ url_for('style') }}">Style</a></li>
-                    <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
+                    <li><a href="{{ url_for('user_images', id=current_user.id) }}">Your Gallery</a></li>
+                    <!--<li><a href="{{ url_for('gallery') }}">Gallery</a></li>-->
                     <li><a href="{{ url_for('about') }}">About</a></li>
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>
                     {% endif %}
@@ -76,7 +77,7 @@
 
 
     <main id="main">
-        
+
         {% block index %}{% endblock %}
         {% block start %}{% endblock %}
         {% block about %}{% endblock %}
@@ -86,6 +87,7 @@
         {% block results %}{% endblock %}
         {% block login %}{% endblock %}
         {% block register %}{% endblock %}
+        {% block user_images %}{% endblock %}
 
 
 
@@ -147,8 +149,8 @@
     <!-- Custom scripts -->
     <script src="../static/js/download.js"></script>
 
-
     <script type="text/javascript">
+
         $(document).ready(function () {
             $(document).on('change', '.btn-file :file', function () {
                 var input = $(this),
@@ -226,10 +228,10 @@
             });
 
             $('#export_btn').click(function () {
-                var src = $('#result').attr('src'); 
-                var tarr = src.split('/');     
-                var file = tarr[tarr.length - 1]; 
-                var data = file.split('.')[0]; 
+                var src = $('#result').attr('src');
+                var tarr = src.split('/');
+                var file = tarr[tarr.length - 1];
+                var data = file.split('.')[0];
                 var link = document.createElement('a');
                 link.setAttribute('href', src);
                 if ($('#jpg_rad').is(':checked')) {
@@ -257,7 +259,27 @@
                 window.location = "register";
             });
 
-            $('.facebook-btn').click(function () {
+            $('#btn-popover').click(function (event) {
+                var xhr = null;
+                var elem = $(event.currentTarget);
+                xhr = $.ajax(
+                    $('#btn-popover').attr('href').done(
+                        function (data) {
+                            xhr = null;
+                            elem.popover({
+                                trigger: 'manual',
+                                html: true,
+                                animation: false,
+                                container: elem,
+                                content: data
+                            }).popover('show');
+                        }
+                    ));
+            });    
+
+            
+
+            $('#facebook-btn').click(function () {
                 window.location = "https://229fcf89.ngrok.io/authorize/facebook";
             });
 

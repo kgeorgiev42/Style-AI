@@ -1,0 +1,65 @@
+﻿{% extends "base.html" %}
+
+{% block user_stats %}
+<div class="container-fluid">
+    <div class="table-responsive">
+        <table class="table">
+            <thead class="text-center">
+                <tr>
+                    <th scope="row">Generated image stats</th>
+                </tr>
+            </thead>
+            <tr>
+                <th scope="row">Image:</th>
+                <td width="20" style="border: 0px;"><img src="{{user_image['gen_image_path']}}" alt=""></td>
+            </tr>
+            <tr>
+                <th scope="row">Generatied image width:</th>
+                <td class="text-center">{{user_image['gen_image_width']}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Generatied image height:</th>
+                <td class="text-center">{{user_image['gen_image_height']}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Iterations:</th>
+                <td class="text-center">{{user_image['num_iters']}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Model name:</th>
+                <td class="text-center">{{user_image['model_name']}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Total loss:</th>
+                <td class="text-center">{{user_image['total_loss']}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Style loss:</th>
+                <td class="text-center">{{user_image['style_loss']}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Content loss:</th>
+                <td class="text-center">{{user_image['content_loss']}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Generated on:</th>
+                <td class="text-center">{{user_image['timestamp']}}</td>
+            </tr>
+
+        </table>
+
+        <div class="row" style="margin-bottom:20px;">
+            <div class="col-lg-3"></div>
+            <div class="content wow fadeInLeft col-lg-6">
+                <div class="cta-btn-container text-center">
+                    <a href="{{ url_for('user_images', id=current_user.id)}}" class="btn btn-outline btn-xl btn-block btn-popover" id="btn-stat-close" style="background-color:indianred; margin-top:20px;">
+                        Close
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3"></div>
+        </div>
+        </div>
+    </div>
+
+{% endblock %}

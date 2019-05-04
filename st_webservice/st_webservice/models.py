@@ -37,9 +37,9 @@ class Image(db.Model):
     gen_image_height = db.Column(db.Integer)
     num_iters = db.Column(db.Integer)
     model_name = db.Column(db.String(64))
-    total_loss = db.Column(db.BigInteger)
-    style_loss = db.Column(db.BigInteger)
-    content_loss = db.Column(db.BigInteger)
+    total_loss = db.Column(db.String(64))
+    style_loss = db.Column(db.String(64))
+    content_loss = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 

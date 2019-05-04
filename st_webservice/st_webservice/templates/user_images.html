@@ -1,0 +1,82 @@
+﻿{% extends "layout.html" %}
+
+{% block user_images %}
+
+<section id="gallery">
+    <div class="container-fluid">
+        <div class="section-header">
+            <h3 class="section-title">Your StyleAI Images</h3>
+            <div class="text-center">
+                {% if current_user.is_authenticated %}
+                {% if current_user.is_oauth %}
+                <li class="navbar-brand logo" role="presentation"><h5>Currently logged in as {{ current_user.social_username }}</h5></li>
+                {% else %}
+                <li class="navbar-brand logo" role="presentation"><h5>Currently logged in as {{ current_user.username }}</h5></li>
+                {% endif %}
+                {% endif %}
+            </div>
+            <span class="section-divider"></span>
+            <p class="section-description">View and edit your creations.</p>
+        </div>
+
+        <div class="row">
+            <div class="container text-center">
+                <h4 class="err-mes" style="margin: 20px auto; color:gray">{{message}}</h4>
+            </div>
+        </div>
+
+        <div class="row no-gutters">
+            {% for image in images %}
+            <div class="col-lg-4 col-md-6">
+                <div class="gallery-item wow fadeInUp">
+                    <a href="{{image['gen_image_path']}}" class="gallery-popup">
+                        <img src="{{image['gen_image_path']}}" alt="">
+                    </a>
+                    <div class="row">
+                        <div class="col-lg-3"></div>
+                        <div class="content wow fadeInLeft col-lg-6">
+                            <div class="user_popup">
+                                <div class="cta-btn-container text-center">
+                                    <a href="{{ url_for('user_stats', id=current_user.id, user_image_id=image['id']) }}" class="btn btn-outline btn-xl btn-block btn-popover" id="btn-stat" style="background-color:cadetblue; margin-top:20px;">
+                                        View stats
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3"></div>
+                        <div class="col-lg-3"></div>
+                        <div class="content wow fadeInLeft col-lg-6">
+                            <div class="cta-btn-container text-center">
+                                <button class="btn btn-outline btn-xl btn-block" id="btn-delete" type="submit" style="background-color:indianred; margin-top:20px; margin-bottom:20px;">
+                                    Delete image
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-lg-3"></div>
+                    </div>
+                 </div>
+            </div>
+            {% endfor %}
+
+        </div>
+
+
+
+    </div>
+</section><!-- #gallery -->
+
+<section id="call-to-action">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-9 text-center text-lg-left">
+                <h3 class="cta-title">Create images</h3>
+            </div>
+            <div class="col-lg-3 cta-btn-container text-center">
+                <a class="cta-btn align-middle" href="{{ url_for('style') }}">Generate more images</a>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

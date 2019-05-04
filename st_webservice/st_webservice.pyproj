@@ -105,6 +105,7 @@
     <Content Include="st_webservice\static\contactform\Readme.txt" />
     <Content Include="st_webservice\static\css\scss-files.txt" />
     <Content Include="st_webservice\static\css\style.css" />
+    <Content Include="st_webservice\templates\base.html" />
     <Content Include="st_webservice\templates\default.html" />
     <Content Include="st_webservice\static\img\about-img.jpg" />
     <Content Include="st_webservice\static\img\advanced-feature-1.jpg" />
@@ -181,6 +182,8 @@
     <Content Include="st_webservice\templates\start.html" />
     <Content Include="st_webservice\templates\style.html" />
     <Content Include="st_webservice\templates\layout.html" />
+    <Content Include="st_webservice\templates\user_images.html" />
+    <Content Include="st_webservice\templates\user_stats.html" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="CondaEnv|CondaEnv|tf-style" />
