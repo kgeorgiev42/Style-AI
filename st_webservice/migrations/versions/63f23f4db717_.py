@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 1a803f05e002
+Revision ID: 63f23f4db717
 Revises: 
-Create Date: 2019-05-03 18:23:29.410315
+Create Date: 2019-05-05 16:57:03.856736
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1a803f05e002'
+revision = '63f23f4db717'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -40,9 +40,9 @@ def upgrade():
     sa.Column('gen_image_height', sa.Integer(), nullable=True),
     sa.Column('num_iters', sa.Integer(), nullable=True),
     sa.Column('model_name', sa.String(length=64), nullable=True),
-    sa.Column('total_loss', sa.BigInteger(), nullable=True),
-    sa.Column('style_loss', sa.BigInteger(), nullable=True),
-    sa.Column('content_loss', sa.BigInteger(), nullable=True),
+    sa.Column('total_loss', sa.String(length=64), nullable=True),
+    sa.Column('style_loss', sa.String(length=64), nullable=True),
+    sa.Column('content_loss', sa.String(length=64), nullable=True),
     sa.Column('timestamp', sa.DateTime(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),

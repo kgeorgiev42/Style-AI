@@ -270,8 +270,8 @@ def user_images(id):
         flash('Authentication failed: User does not exist.')
         return redirect(url_for('login'))
 
-    if user.user_images is None:
-        return render_template('user_images.html', message="No images to show.")
+    if user.user_images.count() == 0:
+        return render_template('user_images.html', images=user.user_images, message='No images to show.')
 
     return render_template('user_images.html', images=user.user_images)
 
@@ -284,10 +284,37 @@ def user_stats(id, user_image_id):
         flash('Authentication failed: User does not exist.')
         return redirect(url_for('login'))
 
-    
+    image = Image.query.filter_by(id=user_image_id).first()
+    if image is None:
+        flash('Image deleted from local storage.')
+        return redirect(url_for('user_images', id=user.id))
+
+    return render_template('user_stats.html', user_image=image)
+
+@app.route('/user_images/<id>/<user_image_id>/delete')
+@login_required
+def delete_image(id, user_image_id):
+    user = User.query.filter_by(id=id).first()
+    if user is None:
+        flash('Authentication failed: User does not exist.')
+        return redirect(url_for('login'))
 
     image = Image.query.filter_by(id=user_image_id).first()
     if image is None:
-        return render_template('user_images.html', message="Undefined image.")
+        flash('Image deleted from local storage.')
+        return redirect(url_for('user_images', id=user.id))
 
-    return render_template('user_stats.html', user_image=image)
+    img_location = image.gen_image_path
+    db.session.delete(image)
+    db.session.commit()
+    app.logger.info('Image successfully removed from database.')
+    try:
+        os.remove(os.path.join('st_webservice/', img_location[3:]))
+    except FileNotFoundError:
+        app.logger.error('File not found in path.')
+
+    flash('Image deleted from local storage.')
+    app.logger.info('Image deleted from local storage.')
+
+    return redirect(url_for('user_images', id=user.id))
+
