@@ -257,25 +257,7 @@
 
             $('#btn-signup').click(function () {
                 window.location = "register";
-            });
-
-            $('#btn-popover').click(function (event) {
-                var xhr = null;
-                var elem = $(event.currentTarget);
-                xhr = $.ajax(
-                    $('#btn-popover').attr('href').done(
-                        function (data) {
-                            xhr = null;
-                            elem.popover({
-                                trigger: 'manual',
-                                html: true,
-                                animation: false,
-                                container: elem,
-                                content: data
-                            }).popover('show');
-                        }
-                    ));
-            });    
+            });   
 
             
 

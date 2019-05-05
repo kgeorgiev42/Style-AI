@@ -284,6 +284,8 @@ def user_stats(id, user_image_id):
         flash('Authentication failed: User does not exist.')
         return redirect(url_for('login'))
 
+    
+
     image = Image.query.filter_by(id=user_image_id).first()
     if image is None:
         return render_template('user_images.html', message="Undefined image.")

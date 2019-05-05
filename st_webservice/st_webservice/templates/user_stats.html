@@ -1,17 +1,16 @@
 ﻿{% extends "base.html" %}
 
 {% block user_stats %}
+
 <div class="container-fluid">
+    <div class="text-center" style="margin-bottom:20px;">
+        <h4><b>Generated image stats</b></h4>
+    </div>
     <div class="table-responsive">
         <table class="table">
-            <thead class="text-center">
-                <tr>
-                    <th scope="row">Generated image stats</th>
-                </tr>
-            </thead>
             <tr>
                 <th scope="row">Image:</th>
-                <td width="20" style="border: 0px;"><img src="{{user_image['gen_image_path']}}" alt=""></td>
+                <td class="text-center"><img src="../../{{user_image['gen_image_path']}}" alt="Generated image"></td>
             </tr>
             <tr>
                 <th scope="row">Generatied image width:</th>
@@ -50,7 +49,7 @@
 
         <div class="row" style="margin-bottom:20px;">
             <div class="col-lg-3"></div>
-            <div class="content wow fadeInLeft col-lg-6">
+            <div class="content col-lg-6">
                 <div class="cta-btn-container text-center">
                     <a href="{{ url_for('user_images', id=current_user.id)}}" class="btn btn-outline btn-xl btn-block btn-popover" id="btn-stat-close" style="background-color:indianred; margin-top:20px;">
                         Close
@@ -59,7 +58,7 @@
             </div>
             <div class="col-lg-3"></div>
         </div>
-        </div>
     </div>
+</div>
 
 {% endblock %}
