@@ -62,7 +62,7 @@
                     <li><a href="{{ url_for('about') }}">About</a></li>
                     {% else %}
                     <li class="menu-active"><a href="{{ url_for('home') }}">Home</a></li>
-                    <li><a href="{{ url_for('style') }}">Style</a></li>
+                    <li><a href="{{ url_for('style', id=current_user.id) }}">Style</a></li>
                     <li><a href="{{ url_for('user_images', id=current_user.id) }}">Your Gallery</a></li>
                     <!--<li><a href="{{ url_for('gallery') }}">Gallery</a></li>-->
                     <li><a href="{{ url_for('about') }}">About</a></li>

@@ -2,6 +2,7 @@
 Routes and views for the flask application.
 """
 import os
+import simplejson as json
 from datetime import datetime
 from flask import render_template
 from st_webservice import app
@@ -9,7 +10,7 @@ from st_webservice.model.run_st import run_style_transfer
 from st_webservice.utils import generate_image_filename, allowed_file
 from tensorflow.keras.applications import VGG16, VGG19, InceptionV3
 
-from flask import (Flask, flash, redirect, render_template, request,
+from flask import (Flask, flash, session, redirect, render_template, request,
 send_from_directory, url_for)
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
@@ -24,6 +25,7 @@ TEMPLATE_CONTENT_FOLDER = 'st_webservice/static/images/content/'
 TEMPLATE_STYLE_FOLDER = 'st_webservice/static/images/content/'
 OUTPUT_IMAGE_FOLDER = 'st_webservice/static/images/output/images/'
 OUTPUT_IMAGE_FORMAT = '.png'
+
 
 
 MODEL_PARAMS = {
@@ -89,7 +91,7 @@ def login():
         login_user(user, remember=log_remember_me)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('style')
+            next_page = url_for('style', id=current_user.id)
         return redirect(next_page)
     return render_template('login.html', title='Sign In')
 
@@ -157,9 +159,10 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register')
 
-@app.route('/style', methods=['GET', 'POST'])
+@app.route('/style/<id>', methods=['GET', 'POST'])
 @login_required
-def style():
+def style(id):
+    
     """Renders the style page."""
     if request.method == 'POST':
         app.logger.info('Saving images..')
@@ -257,9 +260,27 @@ def style():
         #    'style': "../static/images/upload/style/" + file_names[1],
         #    'result': "../static/images/output/images/" + result_name
         #}
-        
-        return render_template('results.html', **OUTPUT_PARAMS)
-    return render_template('style.html')
+        session['total_loss'] = json.dumps(str(OUTPUT_PARAMS['total_loss']))
+        session['style_loss'] = json.dumps(str(OUTPUT_PARAMS['style_loss']))
+        session['content_loss'] = json.dumps(str(OUTPUT_PARAMS['content_loss']))
+        for param in OUTPUT_PARAMS:
+            if param not in ['total_loss','style_loss','content_loss']:
+                session[param] = OUTPUT_PARAMS[param]
+
+        return redirect(url_for('results', id=current_user.id))
+
+    return render_template('style.html', id=current_user.id)
+
+@app.route('/results/<id>')
+@login_required
+def results(id):
+
+    user = User.query.filter_by(id=id).first()
+    if user is None:
+        flash('Authentication failed: User does not exist.')
+        return redirect(url_for('login'))
+
+    return render_template('results.html', id=current_user.id)
 
 @app.route('/user_images/<id>')
 @login_required

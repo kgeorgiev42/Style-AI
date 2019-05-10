@@ -67,7 +67,11 @@
                     <p class="cta-text"> Import your own custom images for style and content and merge them into one single artistic piece!</p>
                 </div>
                 <div class="col-lg-3 cta-btn-container text-center">
-                    <a class="cta-btn align-middle" href="{{ url_for('style') }}">Create Art</a>
+                    {% if current_user.is_authenticated %}
+                    <a class="cta-btn align-middle" href="{{ url_for('style', id=current_user.id) }}">Create Art</a>
+                    {% else %}
+                    <a class="cta-btn align-middle" href="{{ url_for('login') }}">Create Art</a>
+                    {% endif %}
                 </div>
             </div>
 

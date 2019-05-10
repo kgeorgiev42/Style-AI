@@ -19,7 +19,7 @@
                             <label>Content Image</label>
                         </div>
                     </div>
-                    <img src={{content_path}} alt="content" style="height: auto; width: 100%">
+                    <img src={{session['content_path']}} alt="content" style="height: auto; width: 100%">
 
                 </div>
             </div>
@@ -30,7 +30,7 @@
                             <label>Generated Image</label>
                         </div>
                     </div>
-                    <img id="result" src={{result_path}} style="height: auto; width: 100%" alt="result">
+                    <img id="result" src={{session['result_path']}} style="height: auto; width: 100%" alt="result">
 
                 </div>
             </div>
@@ -41,7 +41,7 @@
                             <label>Style Image</label>
                         </div>
                     </div>
-                    <img src={{style_path}} alt="style" style="height: auto; width: 100%">
+                    <img src={{session['style_path']}} alt="style" style="height: auto; width: 100%">
                 </div>
             </div>
         </div>
@@ -108,31 +108,31 @@
                     <tbody>
                         <tr>
                             <th scope="row">Model name:</th>
-                            <td class="text-center">{{model_name}}</td>
+                            <td class="text-center">{{session['model_name']}}</td>
                         </tr>
                         <tr>
                             <th scope="row">Iterations:</th>
-                            <td class="text-center">{{num_iterations}}</td>
+                            <td class="text-center">{{session['num_iterations']}}</td>
                         </tr>
                         <tr>
                             <th scope="row">Content weight:</th>
-                            <td class="text-center">{{content_weight}}</td>
+                            <td class="text-center">{{session['content_weight']}}</td>
                         </tr>
                         <tr>
                             <th scope="row">Style weight:</th>
-                            <td class="text-center">{{style_weight}}</td>
+                            <td class="text-center">{{session['style_weight']}}</td>
                         </tr>
                         <tr>
                             <th scope="row">Learning rate:</th>
-                            <td class="text-center">{{lr}}</td>
+                            <td class="text-center">{{session['lr']}}</td>
                         </tr>
                         <tr>
                             <th scope="row">Beta:</th>
-                            <td class="text-center">{{beta1}}</td>
+                            <td class="text-center">{{session['beta1']}}</td>
                         </tr>
                         <tr>
                             <th scope="row">Epsilon:</th>
-                            <td class="text-center">{{epsilon}}</td>
+                            <td class="text-center">{{session['epsilon']}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -147,27 +147,27 @@
                     <tbody>
                         <tr>
                             <th scope="row">Total time:</th>
-                            <td class="text-center">{{total_time}}</td>
+                            <td class="text-center">{{session['total_time']}}</td>
                         </tr>
                         <tr>
                             <th scope="row">Total loss:</th>
-                            <td class="text-center">{{total_loss}}</td>
+                            <td class="text-center">{{session['total_loss'][1:-1]}}</td>
                         </tr>
                         <tr>
                             <th scope="row">Style loss:</th>
-                            <td class="text-center">{{style_loss}}</td>
+                            <td class="text-center">{{session['style_loss'][1:-1]}}</td>
                         </tr>
                         <tr>
                             <th scope="row">Content loss:</th>
-                            <td class="text-center">{{content_loss}}</td>
+                            <td class="text-center">{{session['content_loss'][1:-1]}}</td>
                         </tr>
                         <tr>
                             <th scope="row">Generated image width:</th>
-                            <td class="text-center">{{gen_image_width}}</td>
+                            <td class="text-center">{{session['gen_image_width']}}</td>
                         </tr>
                         <tr>
                             <th scope="row">Generated image height:</th>
-                            <td class="text-center">{{gen_image_height}}</td>
+                            <td class="text-center">{{session['gen_image_height']}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -182,7 +182,7 @@
                             <label><b>Model learning curve</b></label>
                         </div>
                     </div>
-                    <img id="loss" src={{loss_path}} style="height: auto; width: 100%" alt="result">
+                    <img id="loss" src={{session['loss_path']}} style="height: auto; width: 100%" alt="result">
 
                 </div>
             </div>
@@ -193,7 +193,7 @@
                             <label><b>Execution time</b></label>
                         </div>
                     </div>
-                    <img id="execution" src={{exec_path}} style="height: auto; width: 100%" alt="result">
+                    <img id="execution" src={{session['exec_path']}} style="height: auto; width: 100%" alt="result">
 
                 </div>
             </div>
@@ -212,7 +212,7 @@
                 <h3 class="cta-title">Create more images</h3>
             </div>
             <div class="col-lg-3 cta-btn-container text-center">
-                <a class="cta-btn align-middle" href="{{ url_for('style') }}">Generate again</a>
+                <a class="cta-btn align-middle" href="{{ url_for('style', id=current_user.id) }}">Generate again</a>
             </div>
         </div>
 

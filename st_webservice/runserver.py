@@ -13,4 +13,4 @@ if __name__ == '__main__':
         PORT = 5000
 
     app.debug = True
-    app.run(HOST, PORT)
+    app.run(HOST, PORT, threaded=True)
