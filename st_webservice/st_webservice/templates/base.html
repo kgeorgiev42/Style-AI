@@ -77,6 +77,22 @@
     <!-- Custom scripts -->
     <script src="../../../static/js/download.js"></script>
 
+    <script>
+        $('#download_btn').click(function () {
+            var src = $('#gen_result').attr('src');
+            var tarr = src.split('/');
+            var file = tarr[tarr.length - 1];
+            var data = file.split('.')[0];
+            var link = document.createElement('a');
+            link.setAttribute('href', src);
+            link.setAttribute('download', data + ".jpg");
+            link.setAttribute('target', '_blank');
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    </script>
 
 </body>
 

@@ -22,7 +22,7 @@
             </p>
         </div>
 
-        <form action="" method="post" role="form" id="upload-form"  enctype="multipart/form-data">
+        <form action="" method="post" role="form" id="upload-form" enctype="multipart/form-data">
 
             <div class="row">
                 <div class="container-fluid">
@@ -49,7 +49,7 @@
 
                             <div class="form-group col-lg-11 text-center">
                                 <div id="val_message_cont"></div>
-                                <img id='img-upload-content' class="img-fluid" style="height: auto; width: 100%"/>
+                                <img id='img-upload-content' class="img-fluid" style="height: auto; width: 100%" />
                             </div>
                         </div>
 
@@ -74,14 +74,48 @@
                         <div class="form-row">
                             <div class="form-group col-lg-11 text-center">
                                 <div id="val_message_style"></div>
-                                <img id='img-upload-style' class="img-fluid" style="height: auto; width: 100%"/>
+                                <img id='img-upload-style' class="img-fluid" style="height: auto; width: 100%" />
                             </div>
                         </div>
+
+
 
                     </div>
                 </div>
 
             </div>
+
+            <div class="row">
+                <div class="form-group col-lg-6 text-center">
+                    <h5>Select number of iterations:</h5>
+                    <p><i>larger means better performance and more computation time</i></p>
+                    <div class="btn-group">
+                        <select name="iter-select" class="custom-select custom-select-sm">
+                            <option value="100" selected>100 (fast: ETA - 15s)</option>
+                            <option value="500">500 (ETA - 1min)</option>
+                            <option value="1000">1000 (ETA - 2min)</option>
+                            <option value="10000">10000 (slow: ETA - 20min)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group col-lg-6 text-center">
+                    <h5>Select input image resolution:</h5>
+                    <p><i>larger means better image quality and more computation time</i></p>
+                    <div class="btn-group">
+                        <select name="res-select" class="custom-select custom-select-sm">
+                            <option value="128x128" selected>128x128</option>
+                            <option value="256x256">256x256</option>
+                            <option value="512x512">512x512</option>
+                            <option value="1024x1024">1024x1024</option>
+                            <option value="4096x4096">4096x4096</option>
+                        </select>
+                    </div>
+                </div>
+
+
+            </div>
+
             <div class="row">
                 <div class="col-lg-3"></div>
                 <div class="content wow fadeInLeft col-lg-6">
@@ -106,6 +140,15 @@
                     Warning: This may take a few minutes to process.
                 </h6>
             </div>
+
+            <div id="style-status" class="form-group col-lg-12 text-center" style="display:none">
+                <h5>Current status:</h5>
+                <p id="cur_iter">Iteration: </p>
+                <p id="cur_closs">Content Loss: </p>
+                <p id="cur_sloss">Style Loss: </p>
+                <p id="cur_time">Iteration time: </p>
+            </div>
+
             <div class="row">
                 <img src="../static/img/loading.gif" id="gif" style="display: block; margin: 20px auto; width: 100px; visibility: hidden;">
             </div>

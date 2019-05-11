@@ -110,7 +110,7 @@ style_image_path = "test_images/style/K5Vd72D.jpg"
 # In[12]:
 
 
-def read_image(src, img_w=256, img_h=256):
+def read_image(src, img_w, img_h):
   
     img = Image.open(src)
     
@@ -193,8 +193,8 @@ def plot_side_by_side(content_image_path, style_image_path, result_image=None,
 # In[16]:
 
 
-def preprocess_img(img_path, prp_type):
-    img = read_image(img_path)
+def preprocess_img(img_path, img_w, img_h, prp_type):
+    img = read_image(img_path, img_w, img_h)
     img = prp_type(img)
     return img
 
@@ -318,10 +318,10 @@ def get_style_loss(base_style, gram_target):
 # In[25]:
 
 
-def get_feature_representations(model, content_path, style_path, prp_type):
+def get_feature_representations(model, img_w, img_h, content_path, style_path, prp_type):
     
-    content_image = preprocess_img(content_path, prp_type)
-    style_image = preprocess_img(style_path, prp_type)
+    content_image = preprocess_img(content_path, img_w, img_h, prp_type)
+    style_image = preprocess_img(style_path, img_w, img_h, prp_type)
 
     #TODO: err InvalidArgumentError: input depth must be evenly divisible by filter depth: 4 vs 3 [Op:Conv2D]
     # batch compute content and style features
@@ -511,6 +511,8 @@ def run_style_transfer(content_path,
                        exec_path,
                        model_name=VGG16,
                        num_iterations=300,
+                       img_w=256,
+                       img_h=256,
                        content_weight=1e3, 
                        style_weight=1e-2,
                        lr=5,
@@ -536,11 +538,11 @@ def run_style_transfer(content_path,
         layer.trainable = False
 
     # Get the style and content feature representations (from our specified intermediate layers) 
-    style_features, content_features = get_feature_representations(model, content_path, style_path, prp_type)
+    style_features, content_features = get_feature_representations(model, img_w, img_h, content_path, style_path, prp_type)
     gram_style_features = [gram_matrix(style_feature) for style_feature in style_features]
 
     # Set initial image
-    init_image = preprocess_img(content_path, prp_type)
+    init_image = preprocess_img(content_path, img_w, img_h, prp_type)
     init_image = tfe.Variable(init_image, dtype=tf.float32)
     
     # Create the optimizer
@@ -579,10 +581,13 @@ def run_style_transfer(content_path,
     times_np = []
     content_losses_np = []
     iterations = []
+    iterations_times = []
     times = []
-    
+    times_np_iter = []
+    times_iter = []
     
     start_time = time.time()
+    iter_start_time = time.time()
 
     for i in range(num_iterations):
         
@@ -593,21 +598,27 @@ def run_style_transfer(content_path,
         clipped = tf.clip_by_value(init_image, min_vals, max_vals)
         init_image.assign(clipped)
 
+
         if loss < best_loss:
             best_loss = loss
             best_img = deprocess_img(init_image.numpy(), inception=inception)
 
+        times.append(time.time() - start_time)
+        times_np.append('{:.4f}'.format(time.time() - start_time))
+        iterations_times.append(i)
+
         if i % display_interval == 0:
 
-            plot_img = init_image.numpy()
-            plot_img = deprocess_img(plot_img, inception=inception)
+            #plot_img = init_image.numpy()
+            #plot_img = deprocess_img(plot_img, inception=inception)
             
             #lists for plotting
-            imgs.append(plot_img)
-            times.append(time.time() - start_time)
-            times_np.append('{:.4f}'.format(time.time() - start_time))
-            iterations.append(i)
+            #imgs.append(plot_img)
             
+            iterations.append(i)
+            times_iter.append(time.time() - iter_start_time)
+            times_np_iter.append('{:.4f}'.format(time.time() - iter_start_time))
+
             #skip initialization step
             if i != 0:
               total_losses.append(loss)
@@ -625,10 +636,14 @@ def run_style_transfer(content_path,
             print('Total loss: {:.4e}, ' 
                 'Style loss: {:.4e}, '
                 'Content loss: {:.4e}, '
-                'Time: {:.4f}s'.format(loss, style_score, content_score, time.time() - start_time))
+                'Time: {:.4f}s'.format(loss, style_score, content_score, time.time() - iter_start_time))
 
-            start_time = time.time()
-     
+            iter_start_time = time.time()
+
+        start_time = time.time()
+
+        
+
     total_time = '{:.4f}s'.format(time.time() - global_start)
     print('Total time: {:.4f}s'.format(time.time() - global_start))
     
@@ -656,7 +671,7 @@ def run_style_transfer(content_path,
     save_image(best_img, result_path)
 
     plot_learning_curve(iterations, total_losses, style_losses, content_losses, loss_path)
-    plot_time(iterations, times, exec_path)
+    plot_time(iterations_times, times, exec_path)
 
     result_dict = {
         'image': best_img,

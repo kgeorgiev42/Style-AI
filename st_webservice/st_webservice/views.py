@@ -8,6 +8,8 @@ from flask import render_template
 from st_webservice import app
 from st_webservice.model.run_st import run_style_transfer
 from st_webservice.utils import generate_image_filename, allowed_file
+
+import tensorflow as tf
 from tensorflow.keras.applications import VGG16, VGG19, InceptionV3
 
 from flask import (Flask, flash, session, redirect, render_template, request,
@@ -31,6 +33,8 @@ OUTPUT_IMAGE_FORMAT = '.png'
 MODEL_PARAMS = {
         'model_name' : VGG16,
         'num_iterations' : 100,
+        'img_w': 256,
+        'img_h': 256,
         'content_weight':1e3, 
         'style_weight':1e-2,
         'lr':5,
@@ -210,15 +214,25 @@ def style(id):
         MODEL_PARAMS['result_path'] = "st_webservice/static/images/output/images/" + result_name;
         MODEL_PARAMS['loss_path'] = "st_webservice/static/images/output/graphs/" + result_file_name + "_loss" + file_extension;
         MODEL_PARAMS['exec_path'] = "st_webservice/static/images/output/graphs/" + result_file_name + "_time" + file_extension;
+        MODEL_PARAMS['num_iterations'] = int(request.form.get('iter-select'))
+        input_resolution = str(request.form.get('res-select')).split('x')
+        MODEL_PARAMS['img_w'] = int(input_resolution[0])
+        MODEL_PARAMS['img_h'] = int(input_resolution[1])
         
         app.logger.info('Initiating style transfer model..')
+        app.logger.info('Selected image resolution: {}x{}'.format(MODEL_PARAMS['img_w'], MODEL_PARAMS['img_h']))
+        app.logger.info('Selected number of iterations: {}'.format(MODEL_PARAMS['num_iterations']))
 
-        #try:
-        result_dict = run_style_transfer(**MODEL_PARAMS)
-        #except:
-           # message = "Invalid image resolution. Dimensions must be even and divisible numbers(ex. 512x256)."
-            #app.logger.error(message)
-           # return render_template('style.html', message=message)
+        try:
+            result_dict = run_style_transfer(**MODEL_PARAMS)
+        except TypeError:
+           message = "TypeError: Invalid model type or input image types."
+           app.logger.error(message)
+           return render_template('style.html', message=message)
+        except tf.errors.InvalidArgumentError:
+           message = "Invalid image resolution. Dimensions must be even and divisible numbers(ex. 512x256)."
+           app.logger.error(message)
+           return render_template('style.html', message=message)
 
         OUTPUT_PARAMS.update({
             'total_time': result_dict['total_time'],
@@ -324,6 +338,7 @@ def delete_image(id, user_image_id):
     if image is None:
         flash('Image deleted from local storage.')
         return redirect(url_for('user_images', id=user.id))
+
 
     img_location = image.gen_image_path
     db.session.delete(image)
