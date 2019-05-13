@@ -88,6 +88,8 @@
         {% block login %}{% endblock %}
         {% block register %}{% endblock %}
         {% block user_images %}{% endblock %}
+        {% block error_500 %}{% endblock %}
+        {% block error_404 %}{% endblock %}
 
 
 
@@ -265,6 +267,10 @@
             $('#btn-signup').click(function () {
                 window.location = "register";
             });   
+
+            $('#btn-resetpwd').click(function () {
+                $('.reset_message').text('Sending email..');
+            });
 
             
 

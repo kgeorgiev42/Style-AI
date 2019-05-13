@@ -6,6 +6,7 @@ import simplejson as json
 from datetime import datetime
 from flask import render_template
 from st_webservice import app
+from st_webservice.email import send_password_reset_email
 from st_webservice.model.run_st import run_style_transfer
 from st_webservice.utils import generate_image_filename, allowed_file
 
@@ -72,19 +73,53 @@ def about():
         year=datetime.now().year,
     )
 
-@app.route('/reset_pwd')
+@app.route('/reset_pwd', methods=['GET', 'POST'])
 def reset_pwd():
     """Renders the reset password page."""
+    if request.method == 'POST':
+        if current_user.is_authenticated:
+            return redirect(url_for('style', id=current_user.id))
+        email = request.form.get('resetEmail')
+        user = User.query.filter_by(email=email).first()
+        if user:
+            send_password_reset_email(user)
+            flash('Check your email for the instructions to reset your password')
+        else:
+            flash('No user exists with this email address.')
+        return redirect(url_for('login'))
     return render_template(
         'reset_pwd.html',
         year=datetime.now().year,
     )
 
+@app.route('/reset_pwd_token/<token>', methods=['GET', 'POST'])
+def reset_pwd_token(token):
+    if request.method == 'POST':
+        if current_user.is_authenticated:
+            return redirect(url_for('style', id=current_user.id))
+        user = User.verify_reset_password_token(token)
+        if not user:
+            flash('Access Denied: Incorrect Password Token.')
+            return redirect(url_for('login'))
+
+        user_pass = request.form.get('resetPassword')
+        user_pass2 = request.form.get('resetPassword2')
+
+        if user_pass != user_pass2:
+            error = 'Passwords must match.'
+            return render_template('reset_pwd_token.html', title='Reset Password', error=error)
+        
+        user.set_password(user_pass)
+        db.session.commit()
+        flash('Your password has been reset.')
+        return redirect(url_for('login'))
+    return render_template('reset_pwd_token.html')
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         if current_user.is_authenticated:
-            return redirect(url_for('style'))
+            return redirect(url_for('style', id=current_user.id))
         log_username = request.form.get('log_username')
         log_password = request.form.get('log_password')
         log_remember_me = request.form.get('log_remember')
@@ -136,7 +171,7 @@ def logout():
 def register():
     if request.method == 'POST':
         if current_user.is_authenticated:
-            return redirect(url_for('style'))
+            return redirect(url_for('style', id=current_user.id))
         reg_username = request.form.get('reg_username')
         reg_password = request.form.get('reg_password')
         reg_rpassword = request.form.get('reg_rpassword')
@@ -281,7 +316,13 @@ def style(id):
             if param not in ['total_loss','style_loss','content_loss']:
                 session[param] = OUTPUT_PARAMS[param]
 
+
         return redirect(url_for('results', id=current_user.id))
+
+    user = User.query.filter_by(id=id).first()
+    if user.id != current_user.id:
+        flash('Access denied: Incorrect user.')
+        return redirect(url_for('login'))
 
     return render_template('style.html', id=current_user.id)
 
@@ -294,6 +335,10 @@ def results(id):
         flash('Authentication failed: User does not exist.')
         return redirect(url_for('login'))
 
+    if user.id != current_user.id:
+        flash('Access denied: Incorrect user.')
+        return redirect(url_for('login'))
+
     return render_template('results.html', id=current_user.id)
 
 @app.route('/user_images/<id>')
@@ -303,6 +348,10 @@ def user_images(id):
     user = User.query.filter_by(id=id).first()
     if user is None:
         flash('Authentication failed: User does not exist.')
+        return redirect(url_for('login'))
+
+    if user.id != current_user.id:
+        flash('Access denied: Incorrect user.')
         return redirect(url_for('login'))
 
     if user.user_images.count() == 0:
@@ -319,6 +368,10 @@ def user_stats(id, user_image_id):
         flash('Authentication failed: User does not exist.')
         return redirect(url_for('login'))
 
+    if user.id != current_user.id:
+        flash('Access denied: Incorrect user.')
+        return redirect(url_for('login'))
+
     image = Image.query.filter_by(id=user_image_id).first()
     if image is None:
         flash('Image deleted from local storage.')
@@ -332,6 +385,10 @@ def delete_image(id, user_image_id):
     user = User.query.filter_by(id=id).first()
     if user is None:
         flash('Authentication failed: User does not exist.')
+        return redirect(url_for('login'))
+
+    if user.id != current_user.id:
+        flash('Access denied: Incorrect user.')
         return redirect(url_for('login'))
 
     image = Image.query.filter_by(id=user_image_id).first()
@@ -353,4 +410,6 @@ def delete_image(id, user_image_id):
     app.logger.info('Image deleted from local storage.')
 
     return redirect(url_for('user_images', id=user.id))
+
+    
 

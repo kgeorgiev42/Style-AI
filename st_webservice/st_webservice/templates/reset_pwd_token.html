@@ -1,0 +1,30 @@
+﻿{% extends "layout.html" %}
+
+{% block register %}
+
+<section id="about">
+    <div class="container-fluid">
+        <div id="logreg-forms">
+            <div class="form">
+
+                <form method="post" form class="form-signin" name="form-signin">
+                    <input type="password" id="resetPassword" name="resetPassword" class="form-control" placeholder="Enter your new password" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" required="" autofocus="">
+                    <input type="password" id="resetPassword2" name="resetPassword2" class="form-control" placeholder="Repeat your password" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" required="" autofocus="">
+                    {% if error %}
+                    <p class="error" style="color:orangered; margin-top:10px;"><strong>Error:</strong> {{ error }}</p>
+                    {% endif %}
+                    {% for message in get_flashed_messages() %}
+                    {{ message }}
+                    {% endfor %}
+                    <p class="reset_message" style="color:darkgray; margin-top:10px;"></p>
+                    <button class="btn btn-primary btn-block" id="btn-resetpwdtoken" type="submit">Reset Password</button>
+                    <a href="{{ url_for('login') }}" id="cancel_reset"><i class="fas fa-angle-left"></i> Back</a>
+
+                </form>
+            </div>
+        </div>
+</section>
+<section id="about"></section>
+<section id="about"></section>
+<section id="about"></section>
+{% endblock %}
