@@ -11,8 +11,10 @@ from flask_login import LoginManager
 from flask_mail import Mail
 
 
+
 app = Flask(__name__)
 app.config.from_object(Config)
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 mail = Mail(app)
@@ -20,4 +22,15 @@ lm = LoginManager(app)
 lm.login_view = 'login'
 db.create_all()
 
-import st_webservice.views, st_webservice.errors
+from st_webservice.errors import bp as errors_bp
+app.register_blueprint(errors_bp)
+
+from st_webservice.auth import bp as auth_bp
+app.register_blueprint(auth_bp)
+
+from st_webservice.main import bp as main_bp
+app.register_blueprint(main_bp)
+
+
+
+import st_webservice.main.views

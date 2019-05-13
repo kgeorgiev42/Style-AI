@@ -48,7 +48,7 @@
         <div class="container">
 
             <div id="logo" class="pull-left">
-                <h1><a href="{{ url_for('home') }}" class="scrollto">Style AI</a></h1>
+                <h1><a href="{{ url_for('main.home') }}" class="scrollto">Style AI</a></h1>
                 <!-- Uncomment below if you prefer to use an image logo -->
                 <!--<a href="/st_webservice/"><img src="../static/img/logo.png" alt="" title=""></a> -->
             </div>
@@ -56,17 +56,17 @@
             <nav id="nav-menu-container">
                 <ul class="nav-menu">
                     {% if current_user.is_anonymous %}
-                    <li class="menu-active"><a href="{{ url_for('home') }}">Home</a></li>
-                    <li><a href="{{ url_for('login') }}">Login</a></li>
-                    <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
-                    <li><a href="{{ url_for('about') }}">About</a></li>
+                    <li class="menu-active"><a href="{{ url_for('main.home') }}">Home</a></li>
+                    <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                    <li><a href="{{ url_for('main.gallery') }}">Gallery</a></li>
+                    <li><a href="{{ url_for('main.about') }}">About</a></li>
                     {% else %}
-                    <li class="menu-active"><a href="{{ url_for('home') }}">Home</a></li>
-                    <li><a href="{{ url_for('style', id=current_user.id) }}">Style</a></li>
-                    <li><a href="{{ url_for('user_images', id=current_user.id) }}">Your Gallery</a></li>
-                    <!--<li><a href="{{ url_for('gallery') }}">Gallery</a></li>-->
-                    <li><a href="{{ url_for('about') }}">About</a></li>
-                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    <li class="menu-active"><a href="{{ url_for('main.home') }}">Home</a></li>
+                    <li><a href="{{ url_for('main.style', id=current_user.id) }}">Style</a></li>
+                    <li><a href="{{ url_for('main.user_images', id=current_user.id) }}">Your Gallery</a></li>
+                    <!--<li><a href="{{ url_for('main.gallery') }}">Gallery</a></li>-->
+                    <li><a href="{{ url_for('main.about') }}">About</a></li>
+                    <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
                     {% endif %}
                 </ul>
             </nav>
@@ -112,9 +112,9 @@
                 </div>
                 <div class="col-lg-6">
                     <nav class="footer-links text-lg-right text-center pt-2 pt-lg-0">
-                        <a href="{{ url_for('home') }}" class="scrollto">Home</a>
-                        <a href="{{ url_for('gallery') }}" class="scrollto">Gallery</a>
-                        <a href="{{ url_for('about') }}" class="scrollto">About</a>
+                        <a href="{{ url_for('main.home') }}" class="scrollto">Home</a>
+                        <a href="{{ url_for('main.gallery') }}" class="scrollto">Gallery</a>
+                        <a href="{{ url_for('main.about') }}" class="scrollto">About</a>
                     </nav>
                 </div>
             </div>

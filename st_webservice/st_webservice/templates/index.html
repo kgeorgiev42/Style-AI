@@ -68,9 +68,9 @@
                 </div>
                 <div class="col-lg-3 cta-btn-container text-center">
                     {% if current_user.is_authenticated %}
-                    <a class="cta-btn align-middle" href="{{ url_for('style', id=current_user.id) }}">Create Art</a>
+                    <a class="cta-btn align-middle" href="{{ url_for('main.style', id=current_user.id) }}">Create Art</a>
                     {% else %}
-                    <a class="cta-btn align-middle" href="{{ url_for('login') }}">Create Art</a>
+                    <a class="cta-btn align-middle" href="{{ url_for('auth.login') }}">Create Art</a>
                     {% endif %}
                 </div>
             </div>

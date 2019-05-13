@@ -5,7 +5,7 @@ from flask import (Flask, flash, redirect, render_template, request,
 send_from_directory, url_for)
 
 
-from st_webservice import app, views, models
+from st_webservice import app
 
 
 @app.after_request

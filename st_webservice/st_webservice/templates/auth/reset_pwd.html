@@ -10,7 +10,7 @@
                 <form method="post" form class="form-signin" name="form-signin">
                     <input type="email" id="resetEmail" name="resetEmail" class="form-control" placeholder="Email address" required="" autofocus="">
                     <button class="btn btn-primary btn-block" id="btn-resetpwd" type="submit">Reset Password</button>
-                    <a href="{{ url_for('login') }}" id="cancel_reset"><i class="fas fa-angle-left"></i> Back</a>
+                    <a href="{{ url_for('auth.login') }}" id="cancel_reset"><i class="fas fa-angle-left"></i> Back</a>
                     <p class="reset_message" style="color:darkgray; margin-top:10px;"></p>
                 </form>
         </div>
