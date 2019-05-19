@@ -149,6 +149,12 @@
                 <p id="cur_time">Iteration time: </p>
             </div>
 
+            <div class="text-center" style="margin-top:10px; margin-bottom:10px;">
+                {% for message in get_flashed_messages() %}
+                {{ message }}
+                {% endfor %}
+            </div>
+
             <div class="row">
                 <img src="../static/img/loading.gif" id="gif" style="display: block; margin: 20px auto; width: 100px; visibility: hidden;">
             </div>

@@ -1,5 +1,4 @@
 from flask import render_template
-from st_webservice import app
 from st_webservice.errors import bp
 
 @bp.app_errorhandler(404)

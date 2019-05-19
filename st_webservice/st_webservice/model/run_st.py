@@ -4,7 +4,7 @@
 # In[1]:
 
 import uuid
-from st_webservice import app
+import flask
 import gc
 
 import numpy as np
@@ -213,7 +213,6 @@ def deprocess_img(processed_img, inception=False):
 
     if len(x.shape) != 3:
         message = "Invalid input to deprocessing image." 
-        app.logger.error(message)
         return
         
     if inception:
@@ -639,6 +638,7 @@ def run_style_transfer(content_path,
                 'Time: {:.4f}s'.format(loss, style_score, content_score, time.time() - iter_start_time))
 
             iter_start_time = time.time()
+            yield(i)
 
         start_time = time.time()
 

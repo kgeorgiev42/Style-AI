@@ -3,9 +3,12 @@ Routes and views for the flask application.
 """
 import os
 import simplejson as json
+import flask
+import logging
+
+from logging.handlers import RotatingFileHandler
+
 from datetime import datetime
-from flask import render_template
-from st_webservice import app
 from st_webservice.auth.email import send_password_reset_email
 from st_webservice.model.run_st import run_style_transfer
 from st_webservice.main.utils import generate_image_filename, allowed_file
@@ -14,7 +17,7 @@ import tensorflow as tf
 from tensorflow.keras.applications import VGG16, VGG19, InceptionV3
 
 from flask import (Flask, flash, session, redirect, render_template, request,
-send_from_directory, url_for)
+send_from_directory, url_for, stream_with_context, Response)
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 
@@ -47,7 +50,16 @@ MODEL_PARAMS = {
 
 OUTPUT_PARAMS = {}
 
+handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=3)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.ERROR)
+logger.addHandler(handler)
 
+def stream_template(template_name, **context):
+	app.update_template_context(context)
+	t = app.jinja_env.get_template(template_name)
+	rv = t.stream(context)
+    return rv
 
 @bp.route('/')
 @bp.route('/home')
@@ -81,11 +93,11 @@ def style(id):
     
     """Renders the style page."""
     if request.method == 'POST':
-        app.logger.info('Saving images..')
+        logger.info('Saving images..')
         # check if the post request has the file part
         if 'content-file' and 'style-file' not in request.files:
             message = 'Incorrect number of files specified in request.'
-            app.logger.error(message)
+            logger.error(message)
             flash(message)
             return redirect(request.url)
         content_file = request.files['content-file']
@@ -100,18 +112,18 @@ def style(id):
         for i, file in enumerate(files):
             if file.filename == '':
                 message = 'No selected file'
-                app.logger.error(message)
+                logger.error(message)
                 flash(message)
                 return redirect(request.url)
             if not allowed_file(file.filename):
                 if i==0:
                     message = 'Incorrect extension passed for content file'
                     flash(message)
-                    app.logger.error(message)
+                    logger.error(message)
                 else:
                     message = 'Incorrect extension passed for style file'
                     flash(message)
-                    app.logger.error(message)
+                    logger.error(message)
                 return redirect(request.url)
             if file:
                 if i == 0:
@@ -131,19 +143,19 @@ def style(id):
         MODEL_PARAMS['img_w'] = int(input_resolution[0])
         MODEL_PARAMS['img_h'] = int(input_resolution[1])
         
-        app.logger.info('Initiating style transfer model..')
-        app.logger.info('Selected image resolution: {}x{}'.format(MODEL_PARAMS['img_w'], MODEL_PARAMS['img_h']))
-        app.logger.info('Selected number of iterations: {}'.format(MODEL_PARAMS['num_iterations']))
+        logger.info('Initiating style transfer model..')
+        logger.info('Selected image resolution: {}x{}'.format(MODEL_PARAMS['img_w'], MODEL_PARAMS['img_h']))
+        logger.info('Selected number of iterations: {}'.format(MODEL_PARAMS['num_iterations']))
 
         try:
             result_dict = run_style_transfer(**MODEL_PARAMS)
         except TypeError:
            message = "TypeError: Invalid model type or input image types."
-           app.logger.error(message)
+           logger.error(message)
            return render_template('style.html', message=message)
         except tf.errors.InvalidArgumentError:
            message = "Invalid image resolution. Dimensions must be even and divisible numbers(ex. 512x256)."
-           app.logger.error(message)
+           logger.error(message)
            return render_template('style.html', message=message)
 
         OUTPUT_PARAMS.update({
@@ -178,7 +190,7 @@ def style(id):
             db.session.add(image)
             db.session.commit()
 
-            app.logger.info('Saved image to database.')
+            logger.info('Saved image to database.')
 
 
         #params_render = {
@@ -277,16 +289,14 @@ def delete_image(id, user_image_id):
     img_location = image.gen_image_path
     db.session.delete(image)
     db.session.commit()
-    app.logger.info('Image successfully removed from database.')
+    logger.info('Image successfully removed from database.')
     try:
         os.remove(os.path.join('st_webservice/', img_location[3:]))
     except FileNotFoundError:
-        app.logger.error('File not found in path.')
+        logger.error('File not found in path.')
 
     flash('Image deleted from local storage.')
-    app.logger.info('Image deleted from local storage.')
+    logger.info('Image deleted from local storage.')
 
     return redirect(url_for('main.user_images', id=user.id))
-
-    
 

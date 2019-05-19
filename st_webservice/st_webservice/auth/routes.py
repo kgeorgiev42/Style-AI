@@ -12,7 +12,6 @@ import os
 import simplejson as json
 from datetime import datetime
 from flask import render_template
-from st_webservice import app
 from st_webservice.auth.email import send_password_reset_email
 
 @bp.route('/reset_pwd', methods=['GET', 'POST'])
