@@ -17,7 +17,7 @@ import tensorflow as tf
 from tensorflow.keras.applications import VGG16, VGG19, InceptionV3
 
 from flask import (Flask, flash, session, redirect, render_template, request,
-send_from_directory, url_for, stream_with_context, Response)
+send_from_directory, url_for)
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 
@@ -54,12 +54,6 @@ handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=3)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 logger.addHandler(handler)
-
-def stream_template(template_name, **context):
-	app.update_template_context(context)
-	t = app.jinja_env.get_template(template_name)
-	rv = t.stream(context)
-    return rv
 
 @bp.route('/')
 @bp.route('/home')
