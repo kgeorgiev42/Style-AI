@@ -238,7 +238,8 @@ def user_images(id):
         return redirect(url_for('auth.login'))
 
     if user.user_images.count() == 0:
-        return render_template('user_images.html', images=user.user_images, message='No images to show.')
+        flash('No images to show.')
+        return render_template('user_images.html', images=user.user_images)
 
     return render_template('user_images.html', images=user.user_images)
 
