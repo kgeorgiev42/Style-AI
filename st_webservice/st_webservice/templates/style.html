@@ -141,13 +141,6 @@
                 </h6>
             </div>
 
-            <div id="style-status" class="form-group col-lg-12 text-center" style="display:none">
-                <h5>Current status:</h5>
-                <p id="cur_iter">Iteration: </p>
-                <p id="cur_closs">Content Loss: </p>
-                <p id="cur_sloss">Style Loss: </p>
-                <p id="cur_time">Iteration time: </p>
-            </div>
 
             <div class="text-center" style="margin-top:10px; margin-bottom:10px;">
                 {% for message in get_flashed_messages() %}
@@ -156,7 +149,7 @@
             </div>
 
             <div class="row">
-                <img src="../static/img/loading.gif" id="gif" style="display: block; margin: 20px auto; width: 100px; visibility: hidden;">
+                <img src="../static/img/loading.gif" id="gif" style="display: block; margin: 20px auto; width: 300px; visibility: hidden;">
             </div>
         </form>
 

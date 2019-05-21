@@ -229,7 +229,6 @@
                     $('#load').attr('disabled', 'disabled');
                     $('#gif').css('visibility', 'visible');
                     $('.err-mes').text('');
-                    $('#style-status').show();
 
                     return true;
                 }
@@ -264,7 +263,7 @@
                 document.body.removeChild(link);
             });
 
-            $('#btn-delete').click (function () {
+            $('.btn-image-delete').click(function () {
                 prompt_result = confirm('Are you sure you want to delete this image from storage?');
                 return prompt_result;
             });

@@ -277,21 +277,24 @@ def delete_image(id, user_image_id):
 
     image = Image.query.filter_by(id=user_image_id).first()
     if image is None:
-        flash('Image deleted from local storage.')
+        flash('Image not found.')
         return redirect(url_for('main.user_images', id=user.id))
 
 
     img_location = image.gen_image_path
     db.session.delete(image)
     db.session.commit()
-    logger.info('Image successfully removed from database.')
+    message = 'Image successfully removed from database.'
+    logger.info(message)
+    print(message)
     try:
         os.remove(os.path.join('st_webservice/', img_location[3:]))
     except FileNotFoundError:
         logger.error('File not found in path.')
 
-    flash('Image deleted from local storage.')
-    logger.info('Image deleted from local storage.')
+    message = 'Image successfully removed from database.'
+    flash(message)
+    logger.info(message)
 
     return redirect(url_for('main.user_images', id=user.id))
 

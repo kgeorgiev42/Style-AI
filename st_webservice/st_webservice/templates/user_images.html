@@ -35,14 +35,14 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="gallery-item wow fadeInUp">
                         <a href="{{image['gen_image_path']}}" class="gallery-popup">
-                            <img src="{{image['gen_image_path']}}" alt="">
+                            <img src="{{image['gen_image_path']}}" style="height:300px;"alt="">
                         </a>
                         <div class="row">
                             <div class="col-lg-1"></div>
                             <div class="content wow fadeInLeft col-lg-4">
                                 <div class="user_popup">
                                     <div class="cta-btn-container text-center">
-                                        <a href="{{ url_for('main.user_stats', id=current_user.id, user_image_id=image['id']) }}" class="btn btn-outline btn-xl btn-block" id="btn-stat" style="background-color:cadetblue; margin-top:20px;">
+                                        <a href="{{ url_for('main.user_stats', id=current_user.id, user_image_id=image['id']) }}" class="btn btn-outline btn-xl btn-block btn-stat" style="background-color:cadetblue; margin-top:20px;">
                                             View stats
                                         </a>
                                     </div>
@@ -53,7 +53,7 @@
                             <div class="content wow fadeInLeft col-lg-4">
                                 <div class="cta-btn-container text-center">
                                     <div class="cta-btn-container text-center" id="btn-delete">
-                                        <a href="{{ url_for('main.delete_image', id=current_user.id, user_image_id=image['id']) }}" class="btn btn-outline btn-xl btn-block" id="btn-delete" style="background-color:indianred; margin-top:20px; margin-bottom:20px;">
+                                        <a href="{{ url_for('main.delete_image', id=current_user.id, user_image_id=image['id']) }}" class="btn btn-outline btn-xl btn-block btn-image-delete" style="background-color:indianred; margin-top:20px; margin-bottom:20px;">
                                             Delete
                                         </a>
                                     </div>
