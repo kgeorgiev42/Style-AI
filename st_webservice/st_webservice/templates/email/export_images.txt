@@ -1,0 +1,7 @@
+Dear {{ user.username }},
+
+Please find attached the archive of your generated image information that you requested.
+
+Sincerely,
+
+The StyleAI Team

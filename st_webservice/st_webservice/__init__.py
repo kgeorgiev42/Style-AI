@@ -10,6 +10,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_mail import Mail
 from celery import Celery
+from st_webservice.config import config
 
 
 db = SQLAlchemy()
@@ -19,9 +20,10 @@ lm = LoginManager()
 lm.login_view = 'auth.login'
 celery = Celery(__name__, broker=Config.CELERY_BROKER_URL)
 
-def create_app(config_class=Config):
+def create_app(config_name):
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(config[config_name])
+    config[config_name].init_app(app)
 
     db.init_app(app)
     migrate.init_app(app, db)
