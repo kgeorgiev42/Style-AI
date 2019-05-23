@@ -50,8 +50,18 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="st_webservice\__init__.py" />
+    <Compile Include="tests\test_basic.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_client.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="tests\" />
     <Folder Include="st_webservice\" />
     <Folder Include="st_webservice\auth\" />
     <Folder Include="st_webservice\auth\__pycache__\" />

@@ -1,4 +1,6 @@
 import unittest
+
+from unittest.mock import patch, MagicMock
 from st_webservice import create_app, db
 from st_webservice.models import User, Image
 
@@ -29,3 +31,53 @@ class FlaskClientTestCase(unittest.TestCase):
         response = self.client.get('/gallery')
         self.assertEqual(response.status_code, 200)
         self.assertFalse('Currently logged in as ' in response.get_data(as_text=True))
+
+    def test_register_rpwd_and_login(self):
+        # register a new account
+        response = self.client.post('/register', data={
+            'reg_email': 'dummy@example.com',
+            'reg_username': 'Dummy_96',
+            'reg_password': 'Dummy_pwd_96',
+            'reg_rpassword': 'Dummy_pwd_96'
+        })
+        self.assertEqual(response.status_code, 302)
+
+        # reset password
+        user = User.query.filter_by(email='dummy@example.com').first()
+        token = user.get_reset_password_token()
+        response = self.client.post('/reset_pwd_token/{}'.format(token), data={
+            'resetPassword': 'Dummy_pwd_96',
+            'resetPassword2': 'Dummy_pwd_96'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            'Your password has been reset.' in response.get_data(
+                as_text=True))
+
+        # log in with the new account
+        response = self.client.post('/login', data={
+            'log_username': 'Dummy_96',
+            'log_password': 'Dummy_pwd_96',
+            'log_remember': False
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Currently logged in as Dummy_96',
+                                  response.get_data(as_text=True))
+
+
+        # log out
+        response = self.client.get('/logout', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('You have been successfully logged out.' in response.get_data(
+            as_text=True))
+
+    def test_authorizers(self):
+        fb_response = self.client.get('/authorize/facebook')
+        self.assertEqual(fb_response.status_code, 302)
+        self.assertEqual(fb_response.location.split('?')[0], 'https://graph.facebook.com/oauth/authorize')
+        gh_response = self.client.get('/authorize/github')
+        self.assertEqual(gh_response.status_code, 302)
+        self.assertEqual(gh_response.location.split('?')[0], 'https://github.com/login/oauth/authorize')
+        gg_response = self.client.get('/authorize/google')
+        self.assertEqual(gg_response.status_code, 302)
+        self.assertEqual(gg_response.location.split('?')[0], 'https://accounts.google.com/o/oauth2/v2/auth')
