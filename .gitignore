@@ -283,3 +283,6 @@ htmlcov/
 .coverage
 .coverage.*
 *,cover
+
+# Static images
+images/
