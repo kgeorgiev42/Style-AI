@@ -81,3 +81,43 @@ class FlaskClientTestCase(unittest.TestCase):
         gg_response = self.client.get('/authorize/google')
         self.assertEqual(gg_response.status_code, 302)
         self.assertEqual(gg_response.location.split('?')[0], 'https://accounts.google.com/o/oauth2/v2/auth')
+
+    @patch('rauth.OAuth2Service.get_auth_session')
+    def test_callbacks(self, mock_get_auth_session):
+        mock_session = MagicMock()
+        mock_get_response = MagicMock(status_code=200, json=MagicMock(return_value={'name': 'Dummy', 'id': '3617923766551'}))
+        mock_session.get.return_value = mock_get_response
+        mock_get_auth_session.return_value = mock_session
+
+        #facebook session
+        response = self.client.get('/callback/facebook?code=some_code', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        
+        # when response is new user, db entry created
+        self.assertEqual(db.session.query(User).count(), 1)
+        # when response is existing user, no entry added
+        mock_get_response.json.return_value = {'name': 'Dummy', 'id': '3617923766551'}
+        self.assertTrue('Currently logged in as Dummy' in response.get_data(
+            as_text=True))
+
+        #github session
+        response = self.client.get('/callback/github?code=some_code', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        # when response is new user, db entry created
+        self.assertEqual(db.session.query(User).count(), 1)
+        # when response is existing user, no entry added
+        mock_get_response.json.return_value = {'name': 'Dummy', 'id': '3617923766551'}
+        self.assertTrue('Currently logged in as Dummy' in response.get_data(
+            as_text=True))
+
+        #google session
+        response = self.client.get('/callback/google?code=some_code', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        # when response is new user, db entry created
+        self.assertEqual(db.session.query(User).count(), 1)
+        # when response is existing user, no entry added
+        mock_get_response.json.return_value = {'name': 'Dummy', 'id': '3617923766551'}
+        self.assertTrue('Currently logged in as Dummy' in response.get_data(
+            as_text=True))
+        
+        

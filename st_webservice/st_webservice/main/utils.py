@@ -1,6 +1,6 @@
 import uuid
 
-ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
+ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'bmp'])
 
 def generate_image_filename(extension=True):
     if extension:
