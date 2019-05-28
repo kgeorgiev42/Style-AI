@@ -271,7 +271,7 @@ def delete_image(id, user_image_id):
     except FileNotFoundError:
         logger.error('File not found in path.')
 
-    message = 'Image successfully removed from database.'
+    message = 'Image successfully removed from disk.'
     flash(message)
     logger.info(message)
 

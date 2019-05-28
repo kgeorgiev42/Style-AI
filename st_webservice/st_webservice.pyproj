@@ -56,6 +56,12 @@
     <Compile Include="tests\test_client.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="tests\test_handlers.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_main.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="tests\__init__.py">
       <SubType>Code</SubType>
     </Compile>
@@ -215,6 +221,7 @@
     <Content Include="st_webservice\templates\email\export_images.txt" />
     <Content Include="st_webservice\templates\email\reset_password.html" />
     <Content Include="st_webservice\templates\email\reset_password.txt" />
+    <Content Include="st_webservice\templates\errors\403.html" />
     <Content Include="st_webservice\templates\errors\404.html" />
     <Content Include="st_webservice\templates\errors\500.html" />
     <Content Include="st_webservice\templates\gallery.html" />
