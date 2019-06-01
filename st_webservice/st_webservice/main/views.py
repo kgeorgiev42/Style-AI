@@ -136,6 +136,7 @@ def style(id):
             'gen_image_width': result_dict['gen_image_width'],
             'gen_image_height': result_dict['gen_image_height'],
             'model_name': result_dict['model_name'],
+            'num_iterations': int(request.form.get('iter-select')),
             'content_path': "../static/images/upload/content/" + file_names[0],
             'style_path': "../static/images/upload/style/" + file_names[1],
             'result_path': "../static/images/output/images/" + result_name,
