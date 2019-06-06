@@ -1,1 +1,2 @@
-web: flask db upgrade; flask translate compile; gunicorn style-transfer-web-service:app
+web: waitress-serve --port=5000 runserver:app
+worker: celery -A st_webservice worker --pool=eventlet -l info
