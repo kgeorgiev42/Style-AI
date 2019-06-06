@@ -94,8 +94,6 @@ qtconsole==4.4.3
 rauth==0.7.3
 redis==3.2.1
 requests==2.21.0
-rq==1.0
-rq-win==0.3.13
 scikit-image==0.15.0
 scikit-learn==0.20.3
 scipy==1.2.1
