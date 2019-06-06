@@ -66,3 +66,11 @@ def profile(length, profile_dir):
 
 
 
+@app.cli.command()
+def deploy():
+    """Run deployment tasks."""
+    # migrate database to latest revision
+    upgrade()
+
+
+

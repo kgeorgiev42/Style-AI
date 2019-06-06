@@ -7,8 +7,6 @@ load_dotenv(os.path.join(basedir, '.env'))
 
 class Config(object):
     SECRET_KEY = os.urandom(16)
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-    'sqlite:///' + os.path.join(basedir, 'db')
 
     OAUTH_CREDENTIALS = {
     'facebook': {
@@ -25,7 +23,7 @@ class Config(object):
     }
     }
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
+    SQLALCHEMY_RECORD_QUERIES = True
     UPLOAD_CONTENT_FOLDER = 'st_webservice/static/images/upload/content/'
     UPLOAD_STYLE_FOLDER = 'st_webservice/static/images/upload/style/'
     TEMPLATE_CONTENT_FOLDER = 'st_webservice/static/images/content/'
@@ -55,6 +53,10 @@ class Config(object):
         ['true', 'on', '1']
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    FLASK_MAIL_SUBJECT_PREFIX = '[StyleAI]'
+    FLASK_MAIL_SENDER = 'StyleAI Admin <dragonflareful@gmail.com>'
+    FLASK_ADMIN = os.environ.get('FLASK_ADMIN')
+    SSL_REDIRECT = False
     ADMINS = ['dragonflareful@gmail.com']
 
     CELERY_BROKER_URL = 'redis://localhost:6379/0'
@@ -66,8 +68,8 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'db')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
+        'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
 
 class TestingConfig(Config):
     TESTING = True
@@ -79,8 +81,56 @@ class TestingConfig(Config):
     OUTPUT_IMAGE_FOLDER = 'st_webservice/static/test/images/output/images/'
     OUTPUT_STAT_FOLDER = 'st_webservice/static/test/images/output/graphs/'
 
+class ProductionConfig(Config):
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+        'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+
+    @classmethod
+    def init_app(cls, app):
+        Config.init_app(app)
+
+        # email errors to the administrators
+        import logging
+        from logging.handlers import SMTPHandler
+        credentials = None
+        secure = None
+        if getattr(cls, 'MAIL_USERNAME', None) is not None:
+            credentials = (cls.MAIL_USERNAME, cls.MAIL_PASSWORD)
+            if getattr(cls, 'MAIL_USE_TLS', None):
+                secure = ()
+        mail_handler = SMTPHandler(
+            mailhost=(cls.MAIL_SERVER, cls.MAIL_PORT),
+            fromaddr=cls.FLASK_MAIL_SENDER,
+            toaddrs=[cls.FLASK_ADMIN],
+            subject=cls.FLASK_MAIL_SUBJECT_PREFIX + ' Application Error',
+            credentials=credentials,
+            secure=secure)
+        mail_handler.setLevel(logging.ERROR)
+        app.logger.addHandler(mail_handler)
+
+class HerokuConfig(ProductionConfig):
+    SSL_REDIRECT = True if os.environ.get('DYNO') else False
+
+    @classmethod
+    def init_app(cls, app):
+        ProductionConfig.init_app(app)
+
+        # handle reverse proxy server headers
+        from werkzeug.contrib.fixers import ProxyFix
+        app.wsgi_app = ProxyFix(app.wsgi_app)
+
+        # log to stderr
+        import logging
+        from logging import StreamHandler
+        file_handler = StreamHandler()
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+
+
 config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
+    'production': ProductionConfig,
+    'heroku': HerokuConfig,
     'default': DevelopmentConfig
     }
