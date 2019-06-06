@@ -13,6 +13,8 @@ from st_webservice.auth.email import send_password_reset_email
 from st_webservice.model.run_st import run_style_transfer
 from st_webservice.main.utils import generate_image_filename, allowed_file
 
+from flask_sqlalchemy import get_debug_queries
+
 
 from flask import (Flask, flash, session, redirect, render_template, request,
 send_from_directory, url_for, current_app)
@@ -30,6 +32,16 @@ handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=3)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 logger.addHandler(handler)
+
+@bp.after_app_request
+def after_request(response):
+    for query in get_debug_queries():
+        if query.duration >= current_app.config['FLASK_SLOW_DB_QUERY_TIME']:
+            current_app.logger.warning(
+                'Slow query: %s\nParameters: %s\nDuration: %fs\nContext: %s\n' %
+                    (query.statement, query.parameters, query.duration,
+                     query.context))
+    return response
 
 @bp.route('/')
 @bp.route('/home')
