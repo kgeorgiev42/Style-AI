@@ -1,2 +1,2 @@
-web: waitress-serve --port=5000 runserver:app
+web: waitress-serve runserver:app
 worker: celery -A st_webservice worker --pool=eventlet -l info
