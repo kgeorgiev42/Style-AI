@@ -14,7 +14,7 @@ from st_webservice.model.run_st import run_style_transfer
 from st_webservice.main.utils import generate_image_filename, allowed_file
 
 from flask_sqlalchemy import get_debug_queries
-
+import tensorflow as tf
 
 from flask import (Flask, flash, session, redirect, render_template, request,
 send_from_directory, url_for, current_app)
