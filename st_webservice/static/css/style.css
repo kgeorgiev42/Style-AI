@@ -1469,3 +1469,8 @@ form.minimal textarea {
             content: 'GitHub';
         }
 }
+
+.progress {
+    width: 100%;
+    text-align: center;
+}

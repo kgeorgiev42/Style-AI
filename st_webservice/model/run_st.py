@@ -14,8 +14,8 @@ import tensorflow as tf
 import time
 import functools
 import os
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # force tensorflow to use CPU for Heroku
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # force tensorflow to use CPU for Heroku
+#os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import json
 import math as mt
 
@@ -35,6 +35,7 @@ from tensorflow.python.keras.preprocessing import image as kp_image
 from tensorflow.python.keras import models, losses, layers
 
 #from google.colab import files
+from st_webservice import celery
 
 import IPython.display
 
@@ -505,6 +506,8 @@ def save_config(total_losses, style_losses, content_losses, iterations, times, i
 # In[49]:
 
 
+
+
 def run_style_transfer(content_path, 
                        style_path,
                        result_path,
@@ -533,7 +536,7 @@ def run_style_transfer(content_path,
     else:
       raise TypeError("Unsupported model architecture.")
      
-    model, name = get_model(model_name, inception) 
+    model, name = get_model(model_name, inception=False) 
     # print(model)
     for layer in model.layers:
         layer.trainable = False
@@ -573,80 +576,34 @@ def run_style_transfer(content_path,
     min_vals = -norm_means
     max_vals = 255 - norm_means   
 
-    imgs = []
-    style_losses = []
-    total_losses = []
-    content_losses = []
-    total_losses_np = []
-    style_losses_np = []
-    times_np = []
-    content_losses_np = []
-    iterations = []
-    iterations_times = []
-    times = []
-    times_np_iter = []
-    times_iter = []
+    param_dict = {}
+    param_dict['best_img'] = best_img
+    param_dict['style_losses'] = []
+    param_dict['total_losses'] = []
+    param_dict['content_losses'] = []
+    param_dict['total_losses_np'] = []
+    param_dict['style_losses_np'] = []
+    param_dict['times_np'] = []
+    param_dict['content_losses_np'] = []
+    param_dict['iterations'] = []
+    param_dict['iterations_times'] = []
+    param_dict['times'] = []
+    param_dict['times_np_iter'] = []
+    param_dict['times_iter'] = []
+    param_dict['current'] = '0'
+    param_dict['status'] = 'Inactive'
+    param_dict['result'] = '0'
+    param_dict['total'] = '100'
     
     start_time = time.time()
     iter_start_time = time.time()
 
-    for i in range(num_iterations):
-        
+    task = start_transfer_bg.apply_async(num_iterations, cfg, init_image, min_vals, max_vals, best_loss, best_img, display_interval, 
+                      param_dict, start_time, iter_start_time)
 
-        grads, all_loss = compute_gradients(cfg)
-        loss, style_score, content_score = all_loss
-        opt.apply_gradients([(grads, init_image)])
-        clipped = tf.clip_by_value(init_image, min_vals, max_vals)
-        init_image.assign(clipped)
+    return task.id
 
-
-        if loss < best_loss:
-            best_loss = loss
-            best_img = deprocess_img(init_image.numpy(), inception=inception)
-
-        times.append(time.time() - start_time)
-        times_np.append('{:.4f}'.format(time.time() - start_time))
-        iterations_times.append(i)
-
-        if i % display_interval == 0:
-
-            #plot_img = init_image.numpy()
-            #plot_img = deprocess_img(plot_img, inception=inception)
-            
-            #lists for plotting
-            #imgs.append(plot_img)
-            
-            iterations.append(i)
-            times_iter.append(time.time() - iter_start_time)
-            times_np_iter.append('{:.4f}'.format(time.time() - iter_start_time))
-
-            #skip initialization step
-            if i != 0:
-              total_losses.append(loss)
-              style_losses.append(style_score)
-              content_losses.append(content_score)
-              total_losses_np.append('{:.4e}'.format(loss.numpy()))
-              style_losses_np.append('{:.4e}'.format(style_score.numpy()))
-              content_losses_np.append('{:.4e}'.format(content_score.numpy()))
-           
-            
-            #plot_image(plot_img)
-            #plt.show()
-            
-            print('Iteration: {}'.format(i))        
-            print('Total loss: {:.4e}, ' 
-                'Style loss: {:.4e}, '
-                'Content loss: {:.4e}, '
-                'Time: {:.4f}s'.format(loss, style_score, content_score, time.time() - iter_start_time))
-
-            iter_start_time = time.time()
-
-        start_time = time.time()
-
-        
-
-    total_time = '{:.4f}s'.format(time.time() - global_start)
-    print('Total time: {:.4f}s'.format(time.time() - global_start))
+    
     
     
     # Uncomment these lines to save the results to your Google Drive (you first need to have it mounted)
@@ -668,23 +625,93 @@ def run_style_transfer(content_path,
         plt.imshow(output)
     plt.show()
 	'''
+  
 
-    save_image(best_img, result_path)
+@celery.task(bind=True)
+def start_transfer_bg(num_iterations, cfg, init_image, min_vals, max_vals, best_loss, best_img, display_interval, 
+                      param_dict):
 
-    plot_learning_curve(iterations, total_losses, style_losses, content_losses, loss_path)
-    plot_time(iterations_times, times, exec_path)
+    for i in range(num_iterations):
+        
+
+        grads, all_loss = compute_gradients(cfg)
+        loss, style_score, content_score = all_loss
+        opt.apply_gradients([(grads, init_image)])
+        clipped = tf.clip_by_value(init_image, min_vals, max_vals)
+        init_image.assign(clipped)
+
+
+        if loss < best_loss:
+            best_loss = loss
+            param_dict['best_img'] = deprocess_img(init_image.numpy(), inception=False)
+
+        param_dict['times'].append(time.time() - start_time)
+        param_dict['times_np'].append('{:.4f}'.format(time.time() - start_time))
+        param_dict['iterations_times'].append(i)
+
+        if i % display_interval == 0:
+
+            #plot_img = init_image.numpy()
+            #plot_img = deprocess_img(plot_img, inception=inception)
+            
+            #lists for plotting
+            #imgs.append(plot_img)
+            
+            param_dict['iterations'].append(i)
+            param_dict['times_iter'].append(time.time() - iter_start_time)
+            param_dict['times_np_iter'].append('{:.4f}'.format(time.time() - iter_start_time))
+
+            #skip initialization step
+            if i != 0:
+              param_dict['total_losses'].append(loss)
+              param_dict['style_losses'].append(style_score)
+              param_dict['content_losses'].append(content_score)
+              param_dict['total_losses_np'].append('{:.4e}'.format(loss.numpy()))
+              param_dict['style_losses_np'].append('{:.4e}'.format(style_score.numpy()))
+              param_dict['content_losses_np'].append('{:.4e}'.format(content_score.numpy()))
+           
+            
+            #plot_image(plot_img)
+            #plt.show()
+            
+            print('Iteration: {}'.format(i))        
+            print('Total loss: {:.4e}, ' 
+                'Style loss: {:.4e}, '
+                'Content loss: {:.4e}, '
+                'Time: {:.4f}s'.format(loss, style_score, content_score, time.time() - iter_start_time))
+
+            iter_start_time = time.time()
+
+            self.update_state(state='PROGRESS',
+                          meta={param_dict['current']: i, param_dict['total']: total},
+                          param_dict=param_dict)
+            time.sleep(1)
+
+        start_time = time.time()
+
+    total_time = '{:.4f}s'.format(time.time() - global_start)
+    print('Total time: {:.4f}s'.format(time.time() - global_start))
+    
+    save_image(param_dict['best_img'], result_path)
+
+    plot_learning_curve(param_dict['iterations'], param_dict['total_losses'], param_dict['style_losses'], param_dict['content_losses'], loss_path)
+    plot_time(param_dict['iterations'], param_dict['times'], exec_path)
 
     result_dict = {
-        'image': best_img,
-        'total_losses': total_losses,
-        'content_losses': content_losses,
-        'style_losses': style_losses,
-        'iterations': iterations,
-        'times': times,
+        'image': param_dict['best_img'],
+        'total_losses': param_dict['total_losses'],
+        'content_losses': param_dict['content_losses'],
+        'style_losses': param_dict['style_losses'],
+        'iterations': param_dict['iterations'],
+        'times': param_dict['times'],
         'total_time': total_time,
         'model_name': name,
-        'gen_image_width': best_img.shape[0],
-        'gen_image_height': best_img.shape[1]
+        'gen_image_width': param_dict['best_img'].shape[0],
+        'gen_image_height': param_dict['best_img'].shape[1],
+        'current': 100,
+        'total': 100,
+        'status': 'Task completed!',
+        'result': 42
     }
     
     return result_dict

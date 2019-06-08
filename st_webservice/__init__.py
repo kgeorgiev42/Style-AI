@@ -12,7 +12,6 @@ from flask_mail import Mail
 from celery import Celery
 from st_webservice.config import config
 
-
 db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()

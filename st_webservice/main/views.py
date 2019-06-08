@@ -10,7 +10,7 @@ from logging.handlers import RotatingFileHandler
 
 from datetime import datetime
 from st_webservice.auth.email import send_password_reset_email
-from st_webservice.model.run_st import run_style_transfer
+from st_webservice.model.run_st import run_style_transfer, start_transfer_bg
 from st_webservice.main.utils import generate_image_filename, allowed_file
 
 from flask_sqlalchemy import get_debug_queries
@@ -67,6 +67,35 @@ def about():
         'about.html',
         year=datetime.now().year,
     )
+
+@bp.route('/status/<task_id>')
+def taskstatus(task_id):
+    task = long_task.AsyncResult(task_id)
+    if task.state == 'PENDING':
+        response = {
+            'state': task.state,
+            'current': 0,
+            'total': 1,
+            'status': 'Pending...'
+        }
+    elif task.state != 'FAILURE':
+        response = {
+            'state': task.state,
+            'current': task.info.get('current', 0),
+            'total': task.info.get('total', 1),
+            'status': task.info.get('status', '')
+        }
+        if 'result' in task.info:
+            response['result'] = task.info['result']
+    else:
+        # something went wrong in the background job
+        response = {
+            'state': task.state,
+            'current': 1,
+            'total': 1,
+            'status': str(task.info),  # this is the exception raised
+        }
+    return jsonify(response)
 
 
 @bp.route('/style/<id>', methods=['GET', 'POST'])
@@ -130,7 +159,7 @@ def style(id):
         logger.info('Selected number of iterations: {}'.format(current_app.config['MODEL_PARAMS']['num_iterations']))
 
         try:
-            result_dict = run_style_transfer(**current_app.config['MODEL_PARAMS'])
+            task_id = run_style_transfer(**current_app.config['MODEL_PARAMS'])
         except TypeError:
            message = "TypeError: Invalid model type or input image types."
            logger.error(message)
@@ -139,6 +168,8 @@ def style(id):
            message = "Invalid image resolution. Dimensions must be even and divisible numbers(ex. 512x256)."
            logger.error(message)
            return render_template('style.html', message=message)
+
+        result_dict = start_transfer_bg.AsyncResult(task_id)
 
         current_app.config['OUTPUT_PARAMS'].update({
             'total_time': result_dict['total_time'],
@@ -188,8 +219,9 @@ def style(id):
             if param not in ['total_loss','style_loss','content_loss']:
                 session[param] = current_app.config['OUTPUT_PARAMS'][param]
 
-
-        return redirect(url_for('main.results', id=current_user.id))
+        return jsonify({}), 202, {'Location': url_for('taskstatus',
+            task_id=task.id)}
+        #return redirect(url_for('main.results', id=current_user.id))
 
     user = User.query.filter_by(id=id).first()
     if user is None:
