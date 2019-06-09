@@ -14,8 +14,8 @@ import tensorflow as tf
 import time
 import functools
 import os
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # force tensorflow to use CPU for Heroku
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # force tensorflow to use CPU for Heroku
+#os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import json
 import math as mt
 
@@ -37,6 +37,7 @@ from tensorflow.python.keras import models, losses, layers
 #from google.colab import files
 
 import IPython.display
+from st_webservice import celery
 
 # In[2]:
 
@@ -504,16 +505,16 @@ def save_config(total_losses, style_losses, content_losses, iterations, times, i
 
 # In[49]:
 
-
+@celery.task(name='run_style_transfer')
 def run_style_transfer(content_path, 
                        style_path,
                        result_path,
                        loss_path,
                        exec_path,
-                       model_name=VGG16,
                        num_iterations=300,
                        img_w=256,
                        img_h=256,
+                       model_name=VGG16,
                        content_weight=1e3, 
                        style_weight=1e-2,
                        lr=5,
@@ -675,10 +676,9 @@ def run_style_transfer(content_path,
     plot_time(iterations_times, times, exec_path)
 
     result_dict = {
-        'image': best_img,
-        'total_losses': total_losses,
-        'content_losses': content_losses,
-        'style_losses': style_losses,
+        'total_losses': json.dumps(total_losses_np),
+        'content_losses': json.dumps(content_losses_np),
+        'style_losses': json.dumps(style_losses_np),
         'iterations': iterations,
         'times': times,
         'total_time': total_time,

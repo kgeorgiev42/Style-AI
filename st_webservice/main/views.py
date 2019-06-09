@@ -26,6 +26,8 @@ from st_webservice.auth.oauth import OAuthSignIn
 
 from st_webservice.main import bp
 
+from st_webservice import celery
+
 
 
 handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=3)
@@ -130,11 +132,20 @@ def style(id):
         logger.info('Selected number of iterations: {}'.format(current_app.config['MODEL_PARAMS']['num_iterations']))
 
         try:
-            result_dict = run_style_transfer(**current_app.config['MODEL_PARAMS'])
-        except TypeError:
-           message = "TypeError: Invalid model type or input image types."
-           logger.error(message)
-           return render_template('style.html', message=message)
+            task = run_style_transfer.delay(str(current_app.config['MODEL_PARAMS']['content_path']),
+                                                  str(current_app.config['MODEL_PARAMS']['style_path']),
+                                                  str(current_app.config['MODEL_PARAMS']['result_path']),
+                                                  str(current_app.config['MODEL_PARAMS']['loss_path']),
+                                                  str(current_app.config['MODEL_PARAMS']['exec_path']),
+                                                  int(current_app.config['MODEL_PARAMS']['num_iterations']),
+                                                  int(current_app.config['MODEL_PARAMS']['img_w']),
+                                                  int(current_app.config['MODEL_PARAMS']['img_h']))
+            async_result = celery.AsyncResult(id=task.task_id)
+            result_dict = async_result.get()
+        #except TypeError:
+           #message = "TypeError: Invalid model type or input image types."
+           #logger.error(message)
+           #return render_template('style.html', message=message)
         except tf.errors.InvalidArgumentError:
            message = "Invalid image resolution. Dimensions must be even and divisible numbers(ex. 512x256)."
            logger.error(message)
@@ -142,9 +153,9 @@ def style(id):
 
         current_app.config['OUTPUT_PARAMS'].update({
             'total_time': result_dict['total_time'],
-            'total_loss': result_dict['total_losses'][-1].numpy(),
-            'style_loss': result_dict['style_losses'][-1].numpy(),
-            'content_loss': result_dict['content_losses'][-1].numpy(),
+            'total_loss': list(json.loads(result_dict['total_losses']))[-1],
+            'style_loss': json.loads(result_dict['style_losses'])[-1],
+            'content_loss': json.loads(result_dict['content_losses'])[-1],
             'gen_image_width': result_dict['gen_image_width'],
             'gen_image_height': result_dict['gen_image_height'],
             'model_name': result_dict['model_name'],
@@ -181,9 +192,9 @@ def style(id):
         #    'style': "../static/images/upload/style/" + file_names[1],
         #    'result': "../static/images/output/images/" + result_name
         #}
-        session['total_loss'] = json.dumps(str(current_app.config['OUTPUT_PARAMS']['total_loss']))
-        session['style_loss'] = json.dumps(str(current_app.config['OUTPUT_PARAMS']['style_loss']))
-        session['content_loss'] = json.dumps(str(current_app.config['OUTPUT_PARAMS']['content_loss']))
+        session['total_loss'] = json.dumps(current_app.config['OUTPUT_PARAMS']['total_loss'])
+        session['style_loss'] = json.dumps(current_app.config['OUTPUT_PARAMS']['style_loss'])
+        session['content_loss'] = json.dumps(current_app.config['OUTPUT_PARAMS']['content_loss'])
         for param in current_app.config['OUTPUT_PARAMS']:
             if param not in ['total_loss','style_loss','content_loss']:
                 session[param] = current_app.config['OUTPUT_PARAMS'][param]

@@ -18,7 +18,7 @@ migrate = Migrate()
 mail = Mail()
 lm = LoginManager()
 lm.login_view = 'auth.login'
-celery = Celery(__name__, broker=Config.CELERY_BROKER_URL)
+celery = Celery(__name__, broker=Config.CELERY_BROKER_URL, backend=Config.CELERY_RESULT_BACKEND)
 
 def create_app(config_name):
     app = Flask(__name__)
