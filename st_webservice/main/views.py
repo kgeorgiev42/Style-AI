@@ -10,7 +10,7 @@ from logging.handlers import RotatingFileHandler
 
 from datetime import datetime
 from st_webservice.auth.email import send_password_reset_email
-from st_webservice.model.run_st import run_style_transfer, start_transfer_bg
+from st_webservice.model.run_st import run_style_transfer
 from st_webservice.main.utils import generate_image_filename, allowed_file
 
 from flask_sqlalchemy import get_debug_queries
@@ -180,13 +180,12 @@ def style(id):
            logger.error(message)
            return render_template('style.html', message=message)
 
-        result_dict = start_transfer_bg.AsyncResult(task_id)
 
         current_app.config['OUTPUT_PARAMS'].update({
             'total_time': result_dict['total_time'],
-            'total_loss': json.loads(result_dict['total_losses'])),
-            'style_loss': json.loads(result_dict['style_losses']),
-            'content_loss': json.loads(result_dict['content_losses']),
+            'total_loss': json.loads(result_dict['total_losses'])[-1],
+            'style_loss': json.loads(result_dict['style_losses'])[-1],
+            'content_loss': json.loads(result_dict['content_losses'])[-1],
             'gen_image_width': result_dict['gen_image_width'],
             'gen_image_height': result_dict['gen_image_height'],
             'model_name': result_dict['model_name'],

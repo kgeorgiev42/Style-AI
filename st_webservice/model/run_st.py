@@ -574,6 +574,20 @@ def run_style_transfer(content_path,
     min_vals = -norm_means
     max_vals = 255 - norm_means   
     
+    imgs = []
+    style_losses = []
+    total_losses = []
+    content_losses = []
+    total_losses_np = []
+    style_losses_np = []
+    times_np = []
+    content_losses_np = []
+    iterations = []
+    iterations_times = []
+    times = []
+    times_np_iter = []
+    times_iter = []
+    
     start_time = time.time()
     iter_start_time = time.time()
     
@@ -658,7 +672,7 @@ def run_style_transfer(content_path,
     save_image(best_img, result_path)
 
     plot_learning_curve(iterations, total_losses, style_losses, content_losses, loss_path)
-    plot_time(iterations, times, exec_path)
+    plot_time(iterations_times, times, exec_path)
 
     result_dict = {
         'total_losses': json.dumps(total_losses_np),
@@ -669,7 +683,7 @@ def run_style_transfer(content_path,
         'total_time': total_time,
         'model_name': name,
         'gen_image_width': best_img.shape[0],
-        'gen_image_height': best_img.shape[1],
+        'gen_image_height': best_img.shape[1]
     }
     
     return result_dict
