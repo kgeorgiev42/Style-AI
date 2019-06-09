@@ -534,7 +534,7 @@ def run_style_transfer(content_path,
     else:
       raise TypeError("Unsupported model architecture.")
      
-    model, name = get_model(model_name, inception) 
+    model, name = get_model(model_name, inception=False) 
     # print(model)
     for layer in model.layers:
         layer.trainable = False
@@ -573,23 +573,31 @@ def run_style_transfer(content_path,
     norm_means = np.array([103.939, 116.779, 123.68])
     min_vals = -norm_means
     max_vals = 255 - norm_means   
-
-    imgs = []
-    style_losses = []
-    total_losses = []
-    content_losses = []
-    total_losses_np = []
-    style_losses_np = []
-    times_np = []
-    content_losses_np = []
-    iterations = []
-    iterations_times = []
-    times = []
-    times_np_iter = []
-    times_iter = []
     
     start_time = time.time()
     iter_start_time = time.time()
+    
+    
+    
+    # Uncomment these lines to save the results to your Google Drive (you first need to have it mounted)
+    #save_image(best_img, cfg_path + image_title)
+    #save_config(total_losses_np, style_losses_np, content_losses_np, iterations, times_np, cfg_path + image_title)
+    
+    '''
+    plt.figure(figsize=(14,4))
+    for i,img in enumerate(imgs):
+        plt.subplot(num_rows,num_cols,i+1)
+        output = img.copy()
+        if len(img.shape) == 4:
+          # Remove the batch dimension
+          output = np.squeeze(img, axis=0)
+        # Normalize for display 
+        output = output.astype('uint8')
+        plt.gca().get_yaxis().set_visible(False)
+        plt.gca().get_xaxis().set_visible(False)
+        plt.imshow(output)
+    plt.show()
+	'''
 
     for i in range(num_iterations):
         
@@ -603,7 +611,7 @@ def run_style_transfer(content_path,
 
         if loss < best_loss:
             best_loss = loss
-            best_img = deprocess_img(init_image.numpy(), inception=inception)
+            best_img = deprocess_img(init_image.numpy(), inception=False)
 
         times.append(time.time() - start_time)
         times_np.append('{:.4f}'.format(time.time() - start_time))
@@ -644,36 +652,13 @@ def run_style_transfer(content_path,
 
         start_time = time.time()
 
-        
-
     total_time = '{:.4f}s'.format(time.time() - global_start)
     print('Total time: {:.4f}s'.format(time.time() - global_start))
     
-    
-    # Uncomment these lines to save the results to your Google Drive (you first need to have it mounted)
-    #save_image(best_img, cfg_path + image_title)
-    #save_config(total_losses_np, style_losses_np, content_losses_np, iterations, times_np, cfg_path + image_title)
-    
-    '''
-    plt.figure(figsize=(14,4))
-    for i,img in enumerate(imgs):
-        plt.subplot(num_rows,num_cols,i+1)
-        output = img.copy()
-        if len(img.shape) == 4:
-          # Remove the batch dimension
-          output = np.squeeze(img, axis=0)
-        # Normalize for display 
-        output = output.astype('uint8')
-        plt.gca().get_yaxis().set_visible(False)
-        plt.gca().get_xaxis().set_visible(False)
-        plt.imshow(output)
-    plt.show()
-	'''
-
     save_image(best_img, result_path)
 
     plot_learning_curve(iterations, total_losses, style_losses, content_losses, loss_path)
-    plot_time(iterations_times, times, exec_path)
+    plot_time(iterations, times, exec_path)
 
     result_dict = {
         'total_losses': json.dumps(total_losses_np),
@@ -684,7 +669,7 @@ def run_style_transfer(content_path,
         'total_time': total_time,
         'model_name': name,
         'gen_image_width': best_img.shape[0],
-        'gen_image_height': best_img.shape[1]
+        'gen_image_height': best_img.shape[1],
     }
     
     return result_dict

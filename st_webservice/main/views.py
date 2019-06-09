@@ -10,7 +10,7 @@ from logging.handlers import RotatingFileHandler
 
 from datetime import datetime
 from st_webservice.auth.email import send_password_reset_email
-from st_webservice.model.run_st import run_style_transfer
+from st_webservice.model.run_st import run_style_transfer, start_transfer_bg
 from st_webservice.main.utils import generate_image_filename, allowed_file
 
 from flask_sqlalchemy import get_debug_queries
@@ -69,6 +69,35 @@ def about():
         'about.html',
         year=datetime.now().year,
     )
+
+@bp.route('/status/<task_id>')
+def taskstatus(task_id):
+    task = long_task.AsyncResult(task_id)
+    if task.state == 'PENDING':
+        response = {
+            'state': task.state,
+            'current': 0,
+            'total': 1,
+            'status': 'Pending...'
+        }
+    elif task.state != 'FAILURE':
+        response = {
+            'state': task.state,
+            'current': task.info.get('current', 0),
+            'total': task.info.get('total', 1),
+            'status': task.info.get('status', '')
+        }
+        if 'result' in task.info:
+            response['result'] = task.info['result']
+    else:
+        # something went wrong in the background job
+        response = {
+            'state': task.state,
+            'current': 1,
+            'total': 1,
+            'status': str(task.info),  # this is the exception raised
+        }
+    return jsonify(response)
 
 
 @bp.route('/style/<id>', methods=['GET', 'POST'])
@@ -151,11 +180,13 @@ def style(id):
            logger.error(message)
            return render_template('style.html', message=message)
 
+        result_dict = start_transfer_bg.AsyncResult(task_id)
+
         current_app.config['OUTPUT_PARAMS'].update({
             'total_time': result_dict['total_time'],
-            'total_loss': list(json.loads(result_dict['total_losses']))[-1],
-            'style_loss': json.loads(result_dict['style_losses'])[-1],
-            'content_loss': json.loads(result_dict['content_losses'])[-1],
+            'total_loss': json.loads(result_dict['total_losses'])),
+            'style_loss': json.loads(result_dict['style_losses']),
+            'content_loss': json.loads(result_dict['content_losses']),
             'gen_image_width': result_dict['gen_image_width'],
             'gen_image_height': result_dict['gen_image_height'],
             'model_name': result_dict['model_name'],
@@ -198,7 +229,6 @@ def style(id):
         for param in current_app.config['OUTPUT_PARAMS']:
             if param not in ['total_loss','style_loss','content_loss']:
                 session[param] = current_app.config['OUTPUT_PARAMS'][param]
-
 
         return redirect(url_for('main.results', id=current_user.id))
 
