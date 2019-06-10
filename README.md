@@ -8,7 +8,7 @@
 
 ![Gallery](https://i.imgur.com/X1F0RJG.png)
 
-# Main features
+## Main features
 
 - User registration and an <b>OAuth2</b> authentication service through Google, Facebook and Github using the <b>Rauth</b> library.
 - Reset password feature using <b>Flask-Mail</b> as an asynchronous <b>Celery</b> task for seding emails in the background.
@@ -17,18 +17,18 @@
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1DGL1r83hRhIq7HXGFbre53tsGUSnDlNK)
 
-# Project structure
+## Project structure
 
 ![Project structure](https://i.imgur.com/Udhs8y0.png)
 
-# Requirements
+## Requirements
 
 - An NVIDIA GPU with the CUDA and CuDNN libraries installed (preferably GTX 8th gen and above) to run tensorflow's GPU version (if you don't have an NVIDIA GPU, you can switch to the CPU version by replacing  ```tensorflow-gpu==1.13.1 ```  with  ```tensorflow==1.13.1 ```  in the <i>requirements.txt</i> file.)
 - Python v3.5 or above, preferably in the Anaconda environment.
 - [Ngrok](https://ngrok.com/) server for creating a tunneled session, in order to run the app locally in a real domain. This is required for the <b>OAuth</b> authentication services, because they don't accept localhost.
 - [Redis](https://redis.io/) server for running background <b>Celery</b> workers for the email service.
 
-# Running the app
+## Running the app
 
 1. Clone the project from this repository to your local directory using:
 ```
@@ -92,9 +92,9 @@ set MAIL_USERNAME=<client username>
 set MAIL_PASSWORD=<client password>
 ```
 
-# Acknowledgements
+## Acknowledgements
 Big thanks to Miguel Grinberg for his [Flask Mega-Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world) series, as well as his Flask Web Development book.
 
-# Coming soon..
+## Coming soon..
 - Starting the Style Transfer service as a background <b>Celery</b> task and displaying the model progress periodically through AJAX requests.
 - Cloud deployment using <b>Heroku</b>, or another similar service.
