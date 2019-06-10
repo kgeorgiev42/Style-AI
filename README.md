@@ -93,7 +93,7 @@ set MAIL_PASSWORD=<client password>
 ```
 
 # Acknowledgements
-Big thanks to Miguel Grinberg for his [Flask Mega-Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world) series, as weel as his Flask Web Development book.
+Big thanks to Miguel Grinberg for his [Flask Mega-Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world) series, as well as his Flask Web Development book.
 
 # Coming soon..
 - Starting the Style Transfer service as a background <b>Celery</b> task and displaying the model progress periodically through AJAX requests.
