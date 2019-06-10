@@ -82,7 +82,9 @@ $('.github-btn').click(function () {window.location = "https://1e498486.ngrok.io
 8. Testing the reset password feature:
 - Start the Redis server
 - Create a pool of <b>Celery</b> workers from a separate console using:
+
 ```celery –A st_webservice worker –-pool=eventlet –l info```
+
 - Set the environment variables for the mail server (example for Gmail):
 ```
 set MAIL_SERVER=smtp.googlemail.com 
