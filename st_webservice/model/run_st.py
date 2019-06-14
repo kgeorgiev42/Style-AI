@@ -505,8 +505,9 @@ def save_config(total_losses, style_losses, content_losses, iterations, times, i
 
 # In[49]:
 
-@celery.task(name='run_style_transfer')
-def run_style_transfer(content_path, 
+@celery.task(bind=True, name='run_style_transfer')
+def run_style_transfer(self,
+                       content_path, 
                        style_path,
                        result_path,
                        loss_path,
@@ -662,6 +663,16 @@ def run_style_transfer(content_path,
                 'Content loss: {:.4e}, '
                 'Time: {:.4f}s'.format(loss, style_score, content_score, time.time() - iter_start_time))
 
+            
+
+            print('Saving current state..')
+            self.update_state(state='PROGRESS',
+                          meta={'current': i, 'total': num_iterations,
+                                'total_loss': '{:.4e}'.format(loss), 'style_loss': '{:.4e}'.format(style_score),
+                                'content_loss': '{:.4e}'.format(content_score), 
+                                'cur_time': '{:.4f}s'.format(time.time() - iter_start_time),
+                                'status': 'GENERATING'})
+
             iter_start_time = time.time()
 
         start_time = time.time()
@@ -683,7 +694,11 @@ def run_style_transfer(content_path,
         'total_time': total_time,
         'model_name': name,
         'gen_image_width': best_img.shape[0],
-        'gen_image_height': best_img.shape[1]
+        'gen_image_height': best_img.shape[1],
+        'state': 'COMPLETE',
+        'current': num_iterations, 
+        'total': num_iterations, 
+        'status': 'Complete',
     }
     
     return result_dict

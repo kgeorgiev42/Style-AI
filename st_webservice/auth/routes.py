@@ -19,7 +19,7 @@ def reset_pwd():
     """Renders the reset password page."""
     if request.method == 'POST':
         if current_user.is_authenticated:
-            return redirect(url_for('main.style', id=current_user.id))
+            return redirect(url_for('main.style'))
         email = request.form.get('resetEmail')
         user = User.query.filter_by(email=email).first()
         if user:
@@ -37,7 +37,7 @@ def reset_pwd():
 def reset_pwd_token(token):
     if request.method == 'POST':
         if current_user.is_authenticated:
-            return redirect(url_for('main.style', id=current_user.id))
+            return redirect(url_for('main.style'))
         user = User.verify_reset_password_token(token)
         if not user:
             flash('Access Denied: Incorrect Password Token.')
@@ -60,7 +60,7 @@ def reset_pwd_token(token):
 def login():
     if request.method == 'POST':
         if current_user.is_authenticated:
-            return redirect(url_for('main.style', id=current_user.id))
+            return redirect(url_for('main.style'))
         log_username = request.form.get('log_username')
         log_password = request.form.get('log_password')
         log_remember_me = request.form.get('log_remember')
@@ -71,7 +71,7 @@ def login():
         login_user(user, remember=log_remember_me)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('main.style', id=current_user.id)
+            next_page = url_for('main.style')
         return redirect(next_page)
     return render_template('auth/login.html', title='Sign In')
 
@@ -79,14 +79,14 @@ def login():
 @bp.route('/authorize/<provider>')
 def oauth_authorize(provider):
     if not current_user.is_anonymous:
-        return redirect(url_for('main.style', id=current_user.id))
+        return redirect(url_for('main.style'))
     oauth = OAuthSignIn.get_provider(provider)
     return oauth.authorize()
 
 @bp.route('/callback/<provider>')
 def oauth_callback(provider):
     if not current_user.is_anonymous:
-        return redirect(url_for('main.style', id=current_user.id))
+        return redirect(url_for('main.style'))
     oauth = OAuthSignIn.get_provider(provider)
     social_id, social_username, social_email = oauth.callback()
     if social_id is None:
@@ -98,7 +98,7 @@ def oauth_callback(provider):
         db.session.add(user)
         db.session.commit()
     login_user(user, True)
-    return redirect(url_for('main.style', id=current_user.id))
+    return redirect(url_for('main.style'))
         
 
 
@@ -112,7 +112,7 @@ def logout():
 def register():
     if request.method == 'POST':
         if current_user.is_authenticated:
-            return redirect(url_for('main.style', id=current_user.id))
+            return redirect(url_for('main.style'))
         reg_username = request.form.get('reg_username')
         reg_password = request.form.get('reg_password')
         reg_rpassword = request.form.get('reg_rpassword')

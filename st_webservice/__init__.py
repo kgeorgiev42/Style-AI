@@ -11,7 +11,9 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from celery import Celery
 from st_webservice.config import config
+from st_webservice.flask_util_js import FlaskUtilJs
 
+fujs = FlaskUtilJs()
 db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()
@@ -32,6 +34,7 @@ def create_app(config_name):
     migrate.init_app(app, db)
     mail.init_app(app)
     lm.init_app(app)
+    fujs.init_app(app)
     celery.conf.update(app.config)
 
     from st_webservice.errors import bp as errors_bp

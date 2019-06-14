@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <!-- <link href="../static/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet"> -->
     <!-- Libraries CSS Files -->
-    
+
     <link href="../static/lib/animate/animate.min.css" rel="stylesheet">
     <link href="../static/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <link href="../static/lib/ionicons/css/ionicons.min.css" rel="stylesheet">
@@ -34,6 +34,8 @@
 
     <!-- Main Stylesheet File -->
     <link href="../static/css/style.css" rel="stylesheet">
+
+    {{ flask_util_js.js }}
 
     <!-- =======================================================
       Theme Name: Avilon
@@ -63,7 +65,7 @@
                     <li><a href="{{ url_for('main.about') }}">About</a></li>
                     {% else %}
                     <li class="menu-active"><a href="{{ url_for('main.home') }}">Home</a></li>
-                    <li><a href="{{ url_for('main.style', id=current_user.id) }}">Style</a></li>
+                    <li><a href="{{ url_for('main.style') }}">Style</a></li>
                     <li><a href="{{ url_for('main.user_images', id=current_user.id) }}">Your Gallery</a></li>
                     <!--<li><a href="{{ url_for('main.gallery') }}">Gallery</a></li>-->
                     <li><a href="{{ url_for('main.about') }}">About</a></li>
@@ -164,68 +166,78 @@
             $('#gif').css('visibility', 'invisible');
             $('.err-mes').text('');
 
-            function start_st() {
-                            // add task status elements
-                div = $('<div class="progress"><div></div><div>0%</div><div>...</div><div>&nbsp;</div></div><hr>');
-                $('#progress').append(div);
-                // create a progress bar
-                var nanobar = new Nanobar({
-                    bg: '#44f',
-                    target: div[0].childNodes[0]
-                });
-                // send ajax POST request to start background job
-                $.ajax({
-                    type: 'POST',
-                    url: '/style/{{current_user.id}}',
-                    success: function(data, status, request) {
-                        status_url = request.getResponseHeader('Location');
-                        update_progress(status_url, nanobar, div[0]);
-                    },
-                    error: function() {
-                        alert('Unexpected error');
-                    }
-                });
-
-            }
-
             function update_progress(status_url, nanobar, status_div) {
-            // send GET request to status URL
-            $.getJSON(status_url, function(data) {
-                // update UI
-                percent = parseInt(data['current'] * 100 / data['total']);
-                nanobar.go(percent);
-                $(status_div.childNodes[1]).text(percent + '%');
-                $(status_div.childNodes[2]).text(data['status']);
-                if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
-                    if ('result' in data) {
-                        // show result
-                        $(status_div.childNodes[3]).text('Result: ' + data['result']);
+                // send GET request to status URL
+                $.getJSON(status_url, function (data) {
+                    // update UI
+                    percent = parseInt(data['current'] * 100 / data['total']);
+                    nanobar.go(percent);
+                    $(status_div.childNodes[1]).text(percent + '%');
+                    $(status_div.childNodes[2]).text(data['status']);
+                    $(status_div.childNodes[3]).text('Total loss: ' + data['total_loss']);
+                    $(status_div.childNodes[4]).text('Content loss: ' + data['content_loss']);
+                    $(status_div.childNodes[5]).text('Style loss: ' + data['style_loss']);
+                    $(status_div.childNodes[6]).text('Interval: ' + data['cur_time']);
+                    if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
+                        $(status_div.childNodes[3]).text('');
+                        $(status_div.childNodes[4]).text('');
+                        $(status_div.childNodes[5]).text('');
+                        $(status_div.childNodes[6]).text('');
+                        $(status_div.childNodes[7]).text('');
+                        div_results = $('<div id="results-url"><div></div></div>');
+                        $('#results-url').append(div_results);
+                        user_id = data['user_id'];
+                        console.log('user:', user_id);
+                        var results_url = flask_util.url_for('main.results', { id: user_id });
+                        $(div_results[0].childNodes[0]).html("Generation complete. To view the results click <a href=" + results_url + ">here</a>.");
                     }
                     else {
-                        // something unexpected happened
-                        $(status_div.childNodes[3]).text('Result: ' + data['state']);
+                        // rerun in 2 seconds
+                        setTimeout(function () {
+                            update_progress(status_url, nanobar, status_div);
+                        }, 500);
                     }
-                }
-                else {
-                    // rerun in 2 seconds
-                    setTimeout(function() {
-                        update_progress(status_url, nanobar, status_div);
-                    }, 2000);
-                }
-            });
+                });
             }
 
-            $("#upload-form").submit(function () {
+            $("#upload-form").submit(function (e) {
+                e.preventDefault(); // block the traditional submission of the form.
                 if ($('#val_message_style').text() == "" && $('#val_message_text').text() == "") {
                     $('#load').text('Generating image..');
                     $('#load').attr('disabled', 'disabled');
                     $('#gif').css('visibility', 'visible');
                     $('.err-mes').text('');
-                    return true;
+
+
+                    div = $('<div id="progress"><div></div><div>0%</div><div>...</div><div>...</div><div>...</div><div>...</div><div>&nbsp;</div></div><hr>');
+                    $('#progress').append(div);
+                    // create a progress bar
+                    var nanobar = new Nanobar({
+                        bg: '#44f',
+                        target: div[0].childNodes[0]
+                    });
+                    var form_data = new FormData($('#upload-form')[0]);
+                    // send ajax POST request to start background job
+                    $.ajax({
+                        data: form_data,
+                        type: 'POST',
+                        url: '/st_task',
+                        contentType: false,
+                        processData: false,
+                        success: function (data, status, request) {
+                            console.log(data + "/" + status + "/" + request)
+                            status_url = request.getResponseHeader('Location');
+                            update_progress(status_url, nanobar, div[0]);
+
+                        },
+                        error: function () {
+                            alert('Unexpected error starting the query.');
+                        }
+                    });
                     
                 }
-                return false;
-            });
+                });
+
 
 
             
