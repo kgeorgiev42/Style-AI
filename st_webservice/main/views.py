@@ -224,13 +224,12 @@ def st_task():
             return redirect(request.url)
         if file:
             s3_client = boto3.client('s3')
-            bucket = s3_client.get_bucket(current_app.config['FLASKS3_BUCKET_NAME'])
             if i == 0:
                 print('Saving content file..')
-                s3_client.upload_file(file_names[0], bucket, current_app.config['LOCAL_CONTENT_FOLDER'])
+                s3_client.upload_file(file_names[0], current_app.config['FLASKS3_BUCKET_NAME'], current_app.config['LOCAL_CONTENT_FOLDER'])
             else:
                 print('Saving content file..')
-                s3_client.upload_file(file_names[1], bucket, current_app.config['LOCAL_STYLE_FOLDER'])
+                s3_client.upload_file(file_names[1], current_app.config['FLASKS3_BUCKET_NAME'], current_app.config['LOCAL_STYLE_FOLDER'])
 
     flask_s3.create_all(app)
 
