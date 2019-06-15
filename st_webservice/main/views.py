@@ -5,6 +5,7 @@ import os
 import simplejson as json
 import flask
 import logging
+import flask_s3
 
 from logging.handlers import RotatingFileHandler
 
@@ -219,13 +220,8 @@ def st_task():
                 flash(message)
                 logger.error(message)
             return redirect(request.url)
-        if file:
-            if i == 0:
-                print('Saving content file..')
-                file.save(os.path.join(current_app.config['UPLOAD_CONTENT_FOLDER'], file_names[i]))
-            else:
-                print('Saving style file..')
-                file.save(os.path.join(current_app.config['UPLOAD_STYLE_FOLDER'], file_names[i]))
+
+    flask_s3.create_all(current_app)
 
 
     current_app.config['OUTPUT_PARAMS'] = current_app.config['MODEL_PARAMS'].copy();
