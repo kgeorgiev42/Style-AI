@@ -32,6 +32,8 @@ class Config(object):
     OUTPUT_IMAGE_FOLDER = 'https://styleai.s3.amazonaws.com/static/images/output/images/'
     OUTPUT_STAT_FOLDER = 'https://styleai.s3.amazonaws.com/static/images/output/graphs/'
 
+    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
     FLASKS3_BUCKET_NAME = 'styleai'
 
     
