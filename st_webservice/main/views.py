@@ -8,7 +8,6 @@ import logging
 
 import flask_s3
 import boto3
-from boto.s3.key import Key
 
 from logging.handlers import RotatingFileHandler
 
