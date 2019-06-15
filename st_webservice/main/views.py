@@ -233,7 +233,7 @@ def st_task():
                 file.save(os.path.join('st_webservice/static/images/upload/style/', file_names[i]))
                 s3_client.upload_file(Bucket=current_app.config['FLASKS3_BUCKET_NAME'], Filename='st_webservice/static/images/upload/style/' + file_names[i], Key=current_app.config['LOCAL_STYLE_FOLDER'])
 
-    flask_s3.create_all(app)
+    #flask_s3.create_all(current_app)
 
     current_app.config['OUTPUT_PARAMS'] = current_app.config['MODEL_PARAMS'].copy();
     current_app.config['MODEL_PARAMS']['content_path'] = current_app.config['UPLOAD_CONTENT_FOLDER'] + file_names[0];
