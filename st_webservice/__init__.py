@@ -14,6 +14,8 @@ from st_webservice.config import config
 from st_webservice.flask_util_js import FlaskUtilJs
 from flask_s3 import FlaskS3
 
+import flask_s3
+
 fujs = FlaskUtilJs()
 db = SQLAlchemy()
 migrate = Migrate()
@@ -40,8 +42,7 @@ def create_app(config_name):
     s3.init_app(app)
     celery.conf.update(app.config)
 
-    # serve all static assets to Amazon S3
-    s3.create_all(app)
+    
     
 
     from st_webservice.errors import bp as errors_bp
@@ -52,6 +53,9 @@ def create_app(config_name):
 
     from st_webservice.main import bp as main_bp
     app.register_blueprint(main_bp)
+
+    # serve all static assets to Amazon S3
+    flask_s3.create_all(app)
 
     return app
 
