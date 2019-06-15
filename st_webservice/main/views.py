@@ -223,13 +223,15 @@ def st_task():
                 logger.error(message)
             return redirect(request.url)
         if file:
-            s3_client = boto3.client('s3')
+            s3_client = boto3.client("s3", aws_access_key_id=current_app.config['AWS_ACCESS_KEY_ID'], aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'])
             if i == 0:
                 print('Saving content file..')
-                s3_client.upload_file(file_names[0], current_app.config['FLASKS3_BUCKET_NAME'], current_app.config['LOCAL_CONTENT_FOLDER'])
+                file.save(os.path.join('st_webservice/static/images/upload/content/', file_names[i]))
+                s3_client.upload_file(Bucket=current_app.config['FLASKS3_BUCKET_NAME'], Filename='st_webservice/static/images/upload/content/' + file_names[i], Key=current_app.config['LOCAL_CONTENT_FOLDER'])
             else:
-                print('Saving content file..')
-                s3_client.upload_file(file_names[1], current_app.config['FLASKS3_BUCKET_NAME'], current_app.config['LOCAL_STYLE_FOLDER'])
+                print('Saving style file..')
+                file.save(os.path.join('st_webservice/static/images/upload/style/', file_names[i]))
+                s3_client.upload_file(Bucket=current_app.config['FLASKS3_BUCKET_NAME'], Filename='st_webservice/static/images/upload/style/' + file_names[i], Key=current_app.config['LOCAL_STYLE_FOLDER'])
 
     flask_s3.create_all(app)
 
