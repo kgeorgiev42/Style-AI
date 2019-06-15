@@ -25,12 +25,12 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = True
     FLASK_SLOW_DB_QUERY_TIME = 0.5
-    UPLOAD_CONTENT_FOLDER = '/st_webservice/static/images/upload/content/'
-    UPLOAD_STYLE_FOLDER = '/st_webservice/static/images/upload/style/'
-    TEMPLATE_CONTENT_FOLDER = '/st_webservice/static/images/content/'
-    TEMPLATE_STYLE_FOLDER = '/st_webservice/static/images/style/'
-    OUTPUT_IMAGE_FOLDER = '/st_webservice/static/images/output/images/'
-    OUTPUT_STAT_FOLDER = '/st_webservice/static/images/output/graphs/'
+    UPLOAD_CONTENT_FOLDER = 'st_webservice/static/images/upload/content/'
+    UPLOAD_STYLE_FOLDER = 'st_webservice/static/images/upload/style/'
+    TEMPLATE_CONTENT_FOLDER = 'st_webservice/static/images/content/'
+    TEMPLATE_STYLE_FOLDER = 'st_webservice/static/images/style/'
+    OUTPUT_IMAGE_FOLDER = 'st_webservice/static/images/output/images/'
+    OUTPUT_STAT_FOLDER = 'st_webservice/static/images/output/graphs/'
 
     
     MODEL_PARAMS = {
@@ -48,7 +48,7 @@ class Config(object):
 
     OUTPUT_PARAMS = {}
 
-    MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.googlemail.com')
+    MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
     MAIL_PORT = int(os.environ.get('MAIL_PORT', '587'))
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in \
         ['true', 'on', '1']
