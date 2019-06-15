@@ -221,8 +221,10 @@ def st_task():
             return redirect(request.url)
         if file:
             if i == 0:
+                print('Saving content file..')
                 file.save(os.path.join(current_app.config['UPLOAD_CONTENT_FOLDER'], file_names[i]))
             else:
+                print('Saving style file..')
                 file.save(os.path.join(current_app.config['UPLOAD_STYLE_FOLDER'], file_names[i]))
 
 
