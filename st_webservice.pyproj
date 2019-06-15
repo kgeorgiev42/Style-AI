@@ -39,6 +39,7 @@
     </Compile>
     <Compile Include="st_webservice\errors\handlers.py" />
     <Compile Include="st_webservice\errors\__init__.py" />
+    <Compile Include="st_webservice\main\flask_util_js.py" />
     <Compile Include="st_webservice\main\utils.py" />
     <Compile Include="st_webservice\main\views.py" />
     <Compile Include="st_webservice\main\__init__.py" />
