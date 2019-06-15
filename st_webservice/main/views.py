@@ -7,7 +7,7 @@ import flask
 import logging
 
 import flask_s3
-import boto
+import boto3
 from boto.s3.key import Key
 
 from logging.handlers import RotatingFileHandler
@@ -224,18 +224,14 @@ def st_task():
                 logger.error(message)
             return redirect(request.url)
         if file:
-            s3 = boto.connect_s3()
-            bucket = s3.get_bucket(current_app.config['FLASKS3_BUCKET_NAME'])
+            s3_client = boto3.client('s3')
+            bucket = s3_client.get_bucket(current_app.config['FLASKS3_BUCKET_NAME'])
             if i == 0:
-                full_path = current_app.config['LOCAL_CONTENT_FOLDER']
                 print('Saving content file..')
-                with open(full_path, 'rb') as data:
-                    bucket.put_object(Key=full_path, Body=data)
+                s3_client.upload_file(file_names[0], bucket, current_app.config['LOCAL_CONTENT_FOLDER'])
             else:
-                full_path = current_app.config['LOCAL_STYLE_FOLDER']
-                print('Saving style file..')
-                with open(full_path, 'rb') as data:
-                    bucket.put_object(Key=full_path, Body=data)
+                print('Saving content file..')
+                s3_client.upload_file(file_names[1], bucket, current_app.config['LOCAL_STYLE_FOLDER'])
 
     flask_s3.create_all(app)
 
