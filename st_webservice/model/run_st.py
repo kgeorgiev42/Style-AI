@@ -14,8 +14,8 @@ import tensorflow as tf
 import time
 import functools
 import os
-#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # force tensorflow to use CPU for Heroku
-#os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # force tensorflow to use CPU for Heroku
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import json
 import math as mt
 
