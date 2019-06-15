@@ -25,12 +25,14 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = True
     FLASK_SLOW_DB_QUERY_TIME = 0.5
-    UPLOAD_CONTENT_FOLDER = 'st_webservice/static/images/upload/content/'
-    UPLOAD_STYLE_FOLDER = 'st_webservice/static/images/upload/style/'
-    TEMPLATE_CONTENT_FOLDER = 'st_webservice/static/images/content/'
-    TEMPLATE_STYLE_FOLDER = 'st_webservice/static/images/style/'
-    OUTPUT_IMAGE_FOLDER = 'st_webservice/static/images/output/images/'
-    OUTPUT_STAT_FOLDER = 'st_webservice/static/images/output/graphs/'
+    UPLOAD_CONTENT_FOLDER = 'https://styleai.s3.amazonaws.com/static/images/upload/content/'
+    UPLOAD_STYLE_FOLDER = 'https://styleai.s3.amazonaws.com/static/images/upload/style/'
+    TEMPLATE_CONTENT_FOLDER = 'https://styleai.s3.amazonaws.com/static/images/content/'
+    TEMPLATE_STYLE_FOLDER = 'https://styleai.s3.amazonaws.com/static/images/style/'
+    OUTPUT_IMAGE_FOLDER = 'https://styleai.s3.amazonaws.com/static/images/output/images/'
+    OUTPUT_STAT_FOLDER = 'https://styleai.s3.amazonaws.com/static/images/output/graphs/'
+
+    FLASKS3_BUCKET_NAME = 'styleai'
 
     
     MODEL_PARAMS = {

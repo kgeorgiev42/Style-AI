@@ -12,12 +12,14 @@ from flask_mail import Mail
 from celery import Celery
 from st_webservice.config import config
 from st_webservice.flask_util_js import FlaskUtilJs
+from flask_s3 import FlaskS3
 
 fujs = FlaskUtilJs()
 db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()
 lm = LoginManager()
+s3 = FlaskS3()
 lm.login_view = 'auth.login'
 celery = Celery(__name__, broker=Config.CELERY_BROKER_URL, backend=Config.CELERY_RESULT_BACKEND)
 
@@ -35,7 +37,12 @@ def create_app(config_name):
     mail.init_app(app)
     lm.init_app(app)
     fujs.init_app(app)
+    s3.init_app(app)
     celery.conf.update(app.config)
+
+    # serve all static assets to Amazon S3
+    s3.create_all(app)
+    
 
     from st_webservice.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
