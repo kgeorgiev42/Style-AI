@@ -5,7 +5,10 @@ import os
 import simplejson as json
 import flask
 import logging
+
 import flask_s3
+import boto
+from boto.s3.key import Key
 
 from logging.handlers import RotatingFileHandler
 
@@ -220,9 +223,21 @@ def st_task():
                 flash(message)
                 logger.error(message)
             return redirect(request.url)
+        if file:
+            s3 = boto.connect_s3()
+            bucket = s3.get_bucket(current_app.config['FLASKS3_BUCKET_NAME'])
+            if i == 0:
+                full_path = current_app.config['LOCAL_CONTENT_FOLDER']
+                print('Saving content file..')
+                with open(full_path, 'rb') as data:
+                    bucket.put_object(Key=full_path, Body=data)
+            else:
+                full_path = current_app.config['LOCAL_STYLE_FOLDER']
+                print('Saving style file..')
+                with open(full_path, 'rb') as data:
+                    bucket.put_object(Key=full_path, Body=data)
 
-    flask_s3.create_all(current_app)
-
+    flask_s3.create_all(app)
 
     current_app.config['OUTPUT_PARAMS'] = current_app.config['MODEL_PARAMS'].copy();
     current_app.config['MODEL_PARAMS']['content_path'] = current_app.config['UPLOAD_CONTENT_FOLDER'] + file_names[0];

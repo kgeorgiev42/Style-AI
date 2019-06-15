@@ -25,6 +25,8 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = True
     FLASK_SLOW_DB_QUERY_TIME = 0.5
+    LOCAL_CONTENT_FOLDER = 'static/images/upload/content/'
+    LOCAL_STYLE_FOLDER = 'static/images/upload/style/'
     UPLOAD_CONTENT_FOLDER = 'https://styleai.s3.amazonaws.com/static/images/upload/content/'
     UPLOAD_STYLE_FOLDER = 'https://styleai.s3.amazonaws.com/static/images/upload/style/'
     TEMPLATE_CONTENT_FOLDER = 'https://styleai.s3.amazonaws.com/static/images/content/'
