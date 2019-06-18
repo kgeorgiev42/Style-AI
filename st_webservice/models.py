@@ -51,7 +51,7 @@ class User(UserMixin, db.Model):
 class Image(db.Model):
     __tablename__ = 'images';
     id = db.Column(db.Integer, primary_key=True)
-    gen_image_path = db.Column(db.String(64))
+    gen_image_path = db.Column(db.String(250))
     gen_image_width = db.Column(db.Integer)
     gen_image_height = db.Column(db.Integer)
     num_iters = db.Column(db.Integer)
