@@ -6,15 +6,17 @@ import simplejson as json
 import flask
 import logging
 
+import numpy as np
 import flask_s3
 import boto3
+from io import BytesIO
 
 from logging.handlers import RotatingFileHandler
 
 from datetime import datetime
 from st_webservice.auth.email import send_password_reset_email
 from st_webservice.model.run_st import run_style_transfer
-from st_webservice.main.utils import generate_image_filename, allowed_file
+from st_webservice.main.utils import *
 
 from flask_sqlalchemy import get_debug_queries
 import tensorflow as tf
@@ -30,6 +32,8 @@ from st_webservice.auth.oauth import OAuthSignIn
 from st_webservice.main import bp
 
 from st_webservice import celery
+
+from PIL import Image as PIL_Image
 
 
 
@@ -117,7 +121,25 @@ def status(task_id, user_id):
         output_filename_ct = current_app.config['MODEL_PARAMS']['content_path'].split('/')[-1]
         output_filename_st = current_app.config['MODEL_PARAMS']['style_path'].split('/')[-1]
         output_filename_res = current_app.config['MODEL_PARAMS']['result_path'].split('/')[-1]
+        output_filename_lc = current_app.config['MODEL_PARAMS']['loss_path'].split('/')[-1]
+        output_filename_tc = current_app.config['MODEL_PARAMS']['exec_path'].split('/')[-1]
         result_file_name, file_extension = os.path.splitext(output_filename_res)
+
+        result_image = eval(json.loads(task.info['best_img']))
+        result_image = PIL_Image.frombytes(result_image['mode'], result_image['size'], result_image['pixels'])
+        print("Saving result to s3..")
+        result_path = save_image_s3(result_image, output_filename_res)
+        print(result_path)
+        print("Saving plots to s3..")
+        total_losses = np.array(json.loads(task.info['total_losses']), np.float32)
+        style_losses = np.array(json.loads(task.info['style_losses']), np.float32)
+        content_losses = np.array(json.loads(task.info['content_losses']), np.float32)
+        print(total_losses, len(total_losses))
+        print(task.info['iterations'], len(task.info['iterations']))
+        lc_path = plot_learning_curve_s3(task.info['iterations'], total_losses, style_losses, content_losses, output_filename_lc)
+        tc_path = plot_time_s3(task.info['iterations_times'], task.info['times'], output_filename_tc)
+        print(lc_path, tc_path)
+
         current_app.config['OUTPUT_PARAMS'].update({
             'total_time': task.info['total_time'],
             'total_loss': json.loads(task.info['total_losses'])[-1],
@@ -127,11 +149,11 @@ def status(task_id, user_id):
             'gen_image_height': task.info['gen_image_height'],
             'model_name': task.info['model_name'],
             'num_iterations': int(task.info['total']),
-            'content_path': "../static/images/upload/content/" + output_filename_ct,
-            'style_path': "../static/images/upload/style/" + output_filename_st,
-            'result_path': "../static/images/output/images/" + output_filename_res,
-            'loss_path': "../static/images/output/graphs/" + result_file_name + "_loss" + file_extension,
-            'exec_path': "../static/images/output/graphs/" + result_file_name + "_time" + file_extension,
+            'content_path': current_app.config['S3_OBJECT_URL'] + output_filename_ct,
+            'style_path': current_app.config['S3_OBJECT_URL'] + output_filename_st,
+            'result_path': current_app.config['S3_OBJECT_URL'] + output_filename_res,
+            'loss_path': current_app.config['S3_OBJECT_URL'] + output_filename_lc,
+            'exec_path': current_app.config['S3_OBJECT_URL'] + output_filename_tc,
         });
 
         
@@ -167,6 +189,8 @@ def status(task_id, user_id):
         for param in current_app.config['OUTPUT_PARAMS']:
             if param not in ['total_loss','style_loss','content_loss']:
                 session[param] = current_app.config['OUTPUT_PARAMS'][param]
+
+
     else:
         # something went wrong in the background job
         response = {
@@ -223,24 +247,22 @@ def st_task():
                 logger.error(message)
             return redirect(request.url)
         if file:
-            s3_client = boto3.client("s3", aws_access_key_id=current_app.config['AWS_ACCESS_KEY_ID'], aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'])
             if i == 0:
                 print('Saving content file..')
-                file.save(os.path.join('st_webservice/static/images/upload/content/', file_names[i]))
-                s3_client.upload_file(Bucket=current_app.config['FLASKS3_BUCKET_NAME'], Filename='st_webservice/static/images/upload/content/' + file_names[i], Key=current_app.config['LOCAL_CONTENT_FOLDER'])
+                content_file.filename = file_names[i]
+                output_content_path = upload_file_to_s3(content_file, current_app.config["FLASKS3_BUCKET_NAME"])
             else:
                 print('Saving style file..')
-                file.save(os.path.join('st_webservice/static/images/upload/style/', file_names[i]))
-                s3_client.upload_file(Bucket=current_app.config['FLASKS3_BUCKET_NAME'], Filename='st_webservice/static/images/upload/style/' + file_names[i], Key=current_app.config['LOCAL_STYLE_FOLDER'])
+                style_file.filename = file_names[i]
+                output_style_path = upload_file_to_s3(style_file, current_app.config["FLASKS3_BUCKET_NAME"])
 
-    #flask_s3.create_all(current_app)
 
-    current_app.config['OUTPUT_PARAMS'] = current_app.config['MODEL_PARAMS'].copy();
-    current_app.config['MODEL_PARAMS']['content_path'] = current_app.config['UPLOAD_CONTENT_FOLDER'] + file_names[0];
-    current_app.config['MODEL_PARAMS']['style_path'] = current_app.config['UPLOAD_STYLE_FOLDER'] + file_names[1];
-    current_app.config['MODEL_PARAMS']['result_path'] = current_app.config['OUTPUT_IMAGE_FOLDER'] + result_name;
-    current_app.config['MODEL_PARAMS']['loss_path'] = current_app.config['OUTPUT_STAT_FOLDER'] + result_file_name + "_loss" + file_extension;
-    current_app.config['MODEL_PARAMS']['exec_path'] = current_app.config['OUTPUT_STAT_FOLDER'] + result_file_name + "_time" + file_extension;
+    current_app.config['OUTPUT_PARAMS'] = current_app.config['MODEL_PARAMS'].copy()
+    current_app.config['MODEL_PARAMS']['content_path'] = output_content_path
+    current_app.config['MODEL_PARAMS']['style_path'] = output_style_path
+    current_app.config['MODEL_PARAMS']['result_path'] = current_app.config['OUTPUT_IMAGE_FOLDER'] + result_name
+    current_app.config['MODEL_PARAMS']['loss_path'] = current_app.config['OUTPUT_STAT_FOLDER'] + result_file_name + "_loss" + file_extension
+    current_app.config['MODEL_PARAMS']['exec_path'] = current_app.config['OUTPUT_STAT_FOLDER'] + result_file_name + "_time" + file_extension
     current_app.config['MODEL_PARAMS']['num_iterations'] = int(request.form.get('iter-select'))
     input_resolution = str(request.form.get('res-select')).split('x')
     current_app.config['MODEL_PARAMS']['img_w'] = int(input_resolution[0])
@@ -353,14 +375,20 @@ def delete_image(id, user_image_id):
     message = 'Image successfully removed from database.'
     logger.info(message)
     print(message)
-    try:
-        os.remove(os.path.join('st_webservice/', img_location[3:]))
-    except FileNotFoundError:
-        logger.error('File not found in path.')
+    if 'result_path' in current_app.config['MODEL_PARAMS']:
+        delete_image_s3(current_app.config['MODEL_PARAMS']['result_path'].split('/')[-1],
+                    current_app.config['MODEL_PARAMS']['loss_path'].split('/')[-1],
+                    current_app.config['MODEL_PARAMS']['exec_path'].split('/')[-1])
+    '''
+        try:
+            os.remove(os.path.join('st_webservice/', img_location[3:]))
+        except FileNotFoundError:
+            logger.error('File not found in path.')
+    '''
 
-    message = 'Image successfully removed from disk.'
+    message = 'Image successfully removed from s3 storage.'
     flash(message)
     logger.info(message)
-
+    user = User.query.filter_by(id=id).first()
     return redirect(url_for('main.user_images', id=user.id))
 

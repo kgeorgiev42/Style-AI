@@ -25,6 +25,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = True
     FLASK_SLOW_DB_QUERY_TIME = 0.5
+    
     LOCAL_CONTENT_FOLDER = 'static/images/upload/content/'
     LOCAL_STYLE_FOLDER = 'static/images/upload/style/'
     UPLOAD_CONTENT_FOLDER = 'https://styleai.s3.amazonaws.com/static/images/upload/content/'
@@ -37,7 +38,8 @@ class Config(object):
     AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
     FLASKS3_BUCKET_NAME = 'styleai'
-
+    S3_LOCATION = 'http://{}.s3.amazonaws.com/'.format(FLASKS3_BUCKET_NAME)
+    S3_OBJECT_URL = 'https://styleai.s3.us-east-2.amazonaws.com/'
     
     MODEL_PARAMS = {
             'model_name' : VGG16,
@@ -66,8 +68,8 @@ class Config(object):
     SSL_REDIRECT = False
     ADMINS = ['ivantestov4242@gmail.com']
 
-    CELERY_BROKER_URL = os.environ['REDIS_URL']  #'redis://localhost:6379/0'
-    CELERY_RESULT_BACKEND = os.environ['REDIS_URL']  #'redis://localhost:6379/0' 
+    CELERY_BROKER_URL = os.environ['REDIS_URL'] #'redis://localhost:6379/0'
+    CELERY_RESULT_BACKEND = os.environ['REDIS_URL'] #'redis://localhost:6379/0'
 
     @staticmethod
     def init_app(app):

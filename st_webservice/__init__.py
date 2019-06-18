@@ -54,8 +54,9 @@ def create_app(config_name):
     from st_webservice.main import bp as main_bp
     app.register_blueprint(main_bp)
 
-    # serve all static assets to Amazon S3
-    flask_s3.create_all(app)
+    from st_webservice.model import bp as model_bp
+    app.register_blueprint(model_bp)
+
 
     return app
 

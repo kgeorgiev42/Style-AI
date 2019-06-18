@@ -6,6 +6,12 @@
 import uuid
 import flask
 import gc
+import requests
+
+from io import BytesIO
+
+import boto3, botocore
+from flask import current_app
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -115,7 +121,8 @@ style_image_path = "test_images/style/K5Vd72D.jpg"
 
 def read_image(src, img_w, img_h):
   
-    img = Image.open(src)
+    response = requests.get(src)
+    img = Image.open(BytesIO(response.content))
     
     #scale the image according to its max size
     long = max(img.size)
@@ -392,63 +399,7 @@ def compute_gradients(cfg):
 # In[28]:
 
 
-def plot_learning_curve(iterations, total_losses, style_losses, content_losses, img_file_name):
-  
-  plt.figure(figsize=(8, 8))
-  
-  plt.xlabel('Iterations')
-  plt.ylabel('Losses')
-  plt.title('Style Transfer: Loss function by iterations')
-  
-  plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:,.1e}'))
-  plt.plot(iterations[1:], total_losses, label="Total loss")
-  plt.plot(iterations[1:], style_losses, label="Style loss")
-  plt.plot(iterations[1:], content_losses, label="Content loss")
-  plt.legend()
 
-  '''
-  acc_norm = []
-  acc_znorm = []
-  for total_loss in total_losses:
-    normalized_loss = 1 - (total_loss - (max(total_losses)/(0 - max(total_losses))))
-    acc_norm.append(normalized_loss)
-    print(normalized_loss)
-    
-  for total_loss in acc_norm:
-    normalized_loss = (total_loss - min(acc_norm)) / (max(acc_norm) - min(acc_norm))
-    acc_znorm.append(normalized_loss)
-    print(normalized_loss)
-
-  ax[1].set_xlabel('Iterations')
-  ax[1].set_ylabel('Accuracy')
-  ax[1].set_title('Style Transfer: Total Accuracy by iterations')
-  ax[1].yaxis.set_major_formatter(StrMethodFormatter('{x:,.3f}'))
-  ax[1].plot(iterations[1:], acc_znorm, label="Total accuracy")
-  ax[1].legend()
-  '''
-  
-  plt.savefig(img_file_name)
-  print('Saved loss figure to drive.')
-  #plt.tight_layout()
-  #plt.show()
-
-
-# In[29]:
-
-
-def plot_time(iterations, times, img_file_name):
-  plt.figure(figsize=(8,8))
-  
-  plt.title("Style Transfer computation time by iterations")
-  plt.xlabel("Iterations")
-  plt.ylabel("Time (s)")
-  
-  plt.plot(iterations[1:], times[1:], label="Time")
-  
-  plt.savefig(img_file_name)
-  print('Saved time figure to drive.')
-  #plt.tight_layout()
-  #plt.show()
 
 
 # ### Display results
@@ -471,11 +422,6 @@ def show_results(best_img, content_path, style_path, show_large_final=True):
 # In[42]:
 
 
-def save_image(best_img, path):
-  best_img = best_img.astype('uint8')
-  img = Image.fromarray(best_img)
-  img.save(path)
-  print('Saved image to drive.')
 
 
 # In[43]:
@@ -680,17 +626,27 @@ def run_style_transfer(self,
     total_time = '{:.4f}s'.format(time.time() - global_start)
     print('Total time: {:.4f}s'.format(time.time() - global_start))
     
-    save_image(best_img, result_path)
+    best_image = best_img.astype('uint8')
+    best_image = Image.fromarray(best_image)
+    image = {
+    'pixels': best_image.tobytes(),
+    'size': best_image.size,
+    'mode': best_image.mode,
+    }
+    print(best_image.size, best_image.mode)
+    #save_image(best_img, result_path)
 
-    plot_learning_curve(iterations, total_losses, style_losses, content_losses, loss_path)
-    plot_time(iterations_times, times, exec_path)
+    #plot_learning_curve(iterations, total_losses, style_losses, content_losses, loss_path)
+    #plot_time(iterations_times, times, exec_path)
 
     result_dict = {
+        'best_img': json.dumps(str(image)),
         'total_losses': json.dumps(total_losses_np),
         'content_losses': json.dumps(content_losses_np),
         'style_losses': json.dumps(style_losses_np),
         'iterations': iterations,
         'times': times,
+        'iterations_times': iterations_times,
         'total_time': total_time,
         'model_name': name,
         'gen_image_width': best_img.shape[0],
