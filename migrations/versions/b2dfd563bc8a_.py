@@ -35,7 +35,7 @@ def upgrade():
     op.create_index(op.f('ix_users_username'), 'users', ['username'], unique=True)
     op.create_table('images',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('gen_image_path', sa.String(length=64), nullable=True),
+    sa.Column('gen_image_path', sa.String(length=250), nullable=True),
     sa.Column('gen_image_width', sa.Integer(), nullable=True),
     sa.Column('gen_image_height', sa.Integer(), nullable=True),
     sa.Column('num_iters', sa.Integer(), nullable=True),
