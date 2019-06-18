@@ -38,7 +38,7 @@ class Config(object):
     AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
     FLASKS3_BUCKET_NAME = 'styleai'
-    S3_LOCATION = 'http://{}.s3.amazonaws.com/'.format(FLASKS3_BUCKET_NAME)
+    S3_LOCATION = 'https://{}.s3.amazonaws.com/'.format(FLASKS3_BUCKET_NAME)
     S3_OBJECT_URL = 'https://styleai.s3.us-east-2.amazonaws.com/'
     
     MODEL_PARAMS = {
