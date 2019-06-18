@@ -63,10 +63,10 @@ class Config(object):
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     FLASK_MAIL_SUBJECT_PREFIX = '[StyleAI]'
-    FLASK_MAIL_SENDER = 'StyleAI Admin <ivantestov4242@gmail.com>'
+    FLASK_MAIL_SENDER = 'StyleAI Admin <ivantestov6464@gmail.com>'
     FLASK_ADMIN = os.environ.get('FLASK_ADMIN')
     SSL_REDIRECT = False
-    ADMINS = ['ivantestov4242@gmail.com']
+    ADMINS = ['ivantestov6464@gmail.com']
 
     CELERY_BROKER_URL = os.environ['REDIS_URL'] #'redis://localhost:6379/0'
     CELERY_RESULT_BACKEND = os.environ['REDIS_URL'] #'redis://localhost:6379/0'
