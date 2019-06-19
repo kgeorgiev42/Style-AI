@@ -295,6 +295,10 @@ def st_task():
         message = "Invalid image resolution. Dimensions must be even and divisible numbers(ex. 512x256)."
         logger.error(message)
         return render_template('style.html', message=message)
+    except:
+        message = "Unable to process the input images. Please try using a squared resolution(ex. 512x256)."
+        logger.error(message)
+        return render_template('style.html', message=message)
     
 
 @bp.route('/results/<id>')

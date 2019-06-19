@@ -184,7 +184,7 @@
                         $(status_div.childNodes[5]).text('');
                         $(status_div.childNodes[6]).text('');
                         $(status_div.childNodes[7]).text('');
-                        if (data['status'] != 'Finished') {
+                        if (data['status'] == 'Finished') {
                         div_results = $('<div id="results-url"><div></div></div>');
                         $('#results-url').append(div_results);
                         user_id = data['user_id'];
