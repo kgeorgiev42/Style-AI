@@ -68,8 +68,8 @@ class Config(object):
     SSL_REDIRECT = False
     ADMINS = ['ivantestov6464@gmail.com']
 
-    CELERY_BROKER_URL = os.environ['REDIS_URL'] #'redis://localhost:6379/0'
-    CELERY_RESULT_BACKEND = os.environ['REDIS_URL'] #'redis://localhost:6379/0'
+    CELERY_BROKER_URL = 'redis://localhost:6379/0' #os.environ['REDIS_URL']
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0' #os.environ['REDIS_URL']
 
     @staticmethod
     def init_app(app):
