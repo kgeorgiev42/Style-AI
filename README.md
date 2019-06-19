@@ -113,9 +113,6 @@ S3_LOCATION = 'https://{}.s3.amazonaws.com/'.format(FLASKS3_BUCKET_NAME)
 S3_OBJECT_URL = <your object url> (example: 'https://styleai.s3.us-east-2.amazonaws.com/')
 ```
 
-## Acknowledgements
-Big thanks to Miguel Grinberg for his [Flask Mega-Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world) series, as well as his Flask Web Development book.
-
 ## Update: Heroku Deployment
 As of this point, the app has now been successfully deployed to Heroku in the cloud and is available on https://style-ai.herokuapp.com/.
 
@@ -162,6 +159,11 @@ Afterwards, you might want to restart the working dynos or run an upgrade to the
 heroku run flask deploy
 heroku restart
 ```
+
+
+## Acknowledgements
+Big thanks to Miguel Grinberg for his [Flask Mega-Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world) series, as well as his Flask Web Development book.
+
 
 
 
