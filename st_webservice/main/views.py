@@ -81,38 +81,7 @@ def about():
 @bp.route('/status/<task_id>/<user_id>')
 def status(task_id, user_id):
 
-    try:
-        task = run_style_transfer.AsyncResult(task_id)
-    except TypeError:
-        message = "TypeError: Invalid model type or input image types."
-        logger.error(message)
-        response = {
-                'state': task.state,
-                'current': 1,
-                'total': 1,
-                'status': message,  # this is the exception raised
-            }
-        return jsonify(response)
-    except tf.errors.InvalidArgumentError:
-        message = "Invalid image resolution. Dimensions must be even and divisible numbers(ex. 512x256)."
-        logger.error(message)
-        response = {
-                'state': task.state,
-                'current': 1,
-                'total': 1,
-                'status': message,  # this is the exception raised
-            }
-        return jsonify(response)
-    except:
-        message = "Unable to process the input images. Please try using a squared resolution(ex. 512x256)."
-        logger.error(message)
-        response = {
-                'state': task.state,
-                'current': 1,
-                'total': 1,
-                'status': message,  # this is the exception raised
-            }
-        return jsonify(response)
+    task = run_style_transfer.AsyncResult(task_id)
     
     if task.state == 'PENDING':
         response = {
@@ -230,9 +199,6 @@ def status(task_id, user_id):
             'total': 1,
             'status': str(task.info),  # this is the exception raised
         }
-        
-    
-
     return jsonify(response)
 
 
