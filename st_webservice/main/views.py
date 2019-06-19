@@ -81,125 +81,138 @@ def about():
 @bp.route('/status/<task_id>/<user_id>')
 def status(task_id, user_id):
 
-    task = run_style_transfer.AsyncResult(task_id)
+    try:
+        task = run_style_transfer.AsyncResult(task_id)
     
-    if task.state == 'PENDING':
-        response = {
-            'state': task.state,
-            'current': 0,
-            'total': 1,
-            'total_loss': '',
-            'content_loss': '',
-            'style_loss': '',
-            'cur_time': '',
-            'status': 'Pending'
-        }
-    elif task.state == 'PROGRESS':
-        response = {
-            'state': task.state,
-            'current': task.info.get('current', 0),
-            'total': task.info.get('total', 1),
-            'total_loss': task.info.get('total_loss', ''),
-            'content_loss': task.info.get('content_loss', ''),
-            'style_loss': task.info.get('style_loss', ''),
-            'cur_time': task.info.get('cur_time', ''),
-            'status': task.info.get('status', '')
-        }
-    elif task.state == 'COMPLETE' or task.state == 'SUCCESS':
-        user = User.query.filter_by(id=user_id).first()
-        response = {
-            'state': task.state,
-            'current': 1,
-            'total': 1,
-            'total_loss': task.info.get('total_loss', ''),
-            'content_loss': task.info.get('content_loss', ''),
-            'style_loss': task.info.get('style_loss', ''),
-            'cur_time': task.info.get('cur_time', ''),
-            'user_id': user_id, 
-            'status': 'Finished'
-        }
-        output_filename_ct = current_app.config['MODEL_PARAMS']['content_path'].split('/')[-1]
-        output_filename_st = current_app.config['MODEL_PARAMS']['style_path'].split('/')[-1]
-        output_filename_res = current_app.config['MODEL_PARAMS']['result_path'].split('/')[-1]
-        output_filename_lc = current_app.config['MODEL_PARAMS']['loss_path'].split('/')[-1]
-        output_filename_tc = current_app.config['MODEL_PARAMS']['exec_path'].split('/')[-1]
-        result_file_name, file_extension = os.path.splitext(output_filename_res)
+        if task.state == 'PENDING':
+            response = {
+                'state': task.state,
+                'current': 0,
+                'total': 1,
+                'total_loss': '',
+                'content_loss': '',
+                'style_loss': '',
+                'cur_time': '',
+                'status': 'Pending'
+            }
+        elif task.state == 'PROGRESS':
+            response = {
+                'state': task.state,
+                'current': task.info.get('current', 0),
+                'total': task.info.get('total', 1),
+                'total_loss': task.info.get('total_loss', ''),
+                'content_loss': task.info.get('content_loss', ''),
+                'style_loss': task.info.get('style_loss', ''),
+                'cur_time': task.info.get('cur_time', ''),
+                'status': task.info.get('status', '')
+            }
+        elif task.state == 'COMPLETE' or task.state == 'SUCCESS':
+            user = User.query.filter_by(id=user_id).first()
+            response = {
+                'state': task.state,
+                'current': 1,
+                'total': 1,
+                'total_loss': task.info.get('total_loss', ''),
+                'content_loss': task.info.get('content_loss', ''),
+                'style_loss': task.info.get('style_loss', ''),
+                'cur_time': task.info.get('cur_time', ''),
+                'user_id': user_id, 
+                'status': 'Finished'
+            }
+            output_filename_ct = current_app.config['MODEL_PARAMS']['content_path'].split('/')[-1]
+            output_filename_st = current_app.config['MODEL_PARAMS']['style_path'].split('/')[-1]
+            output_filename_res = current_app.config['MODEL_PARAMS']['result_path'].split('/')[-1]
+            output_filename_lc = current_app.config['MODEL_PARAMS']['loss_path'].split('/')[-1]
+            output_filename_tc = current_app.config['MODEL_PARAMS']['exec_path'].split('/')[-1]
+            result_file_name, file_extension = os.path.splitext(output_filename_res)
 
-        result_image = eval(json.loads(task.info['best_img']))
-        result_image = PIL_Image.frombytes(result_image['mode'], result_image['size'], result_image['pixels'])
-        print("Saving result to s3..")
-        result_path = save_image_s3(result_image, output_filename_res)
-        print(result_path)
-        print("Saving plots to s3..")
-        total_losses = np.array(json.loads(task.info['total_losses']), np.float32)
-        style_losses = np.array(json.loads(task.info['style_losses']), np.float32)
-        content_losses = np.array(json.loads(task.info['content_losses']), np.float32)
-        print(total_losses, len(total_losses))
-        print(task.info['iterations'], len(task.info['iterations']))
-        lc_path = plot_learning_curve_s3(task.info['iterations'], total_losses, style_losses, content_losses, output_filename_lc)
-        tc_path = plot_time_s3(task.info['iterations_times'], task.info['times'], output_filename_tc)
-        print(lc_path, tc_path)
+            result_image = eval(json.loads(task.info['best_img']))
+            result_image = PIL_Image.frombytes(result_image['mode'], result_image['size'], result_image['pixels'])
+            print("Saving result to s3..")
+            result_path = save_image_s3(result_image, output_filename_res)
+            print(result_path)
+            print("Saving plots to s3..")
+            total_losses = np.array(json.loads(task.info['total_losses']), np.float32)
+            style_losses = np.array(json.loads(task.info['style_losses']), np.float32)
+            content_losses = np.array(json.loads(task.info['content_losses']), np.float32)
+            print(total_losses, len(total_losses))
+            print(task.info['iterations'], len(task.info['iterations']))
+            lc_path = plot_learning_curve_s3(task.info['iterations'], total_losses, style_losses, content_losses, output_filename_lc)
+            tc_path = plot_time_s3(task.info['iterations_times'], task.info['times'], output_filename_tc)
+            print(lc_path, tc_path)
 
-        current_app.config['OUTPUT_PARAMS'].update({
-            'total_time': task.info['total_time'],
-            'total_loss': json.loads(task.info['total_losses'])[-1],
-            'style_loss': json.loads(task.info['style_losses'])[-1],
-            'content_loss': json.loads(task.info['content_losses'])[-1],
-            'gen_image_width': task.info['gen_image_width'],
-            'gen_image_height': task.info['gen_image_height'],
-            'model_name': task.info['model_name'],
-            'num_iterations': int(task.info['total']),
-            'content_path': current_app.config['S3_OBJECT_URL'] + output_filename_ct,
-            'style_path': current_app.config['S3_OBJECT_URL'] + output_filename_st,
-            'result_path': current_app.config['S3_OBJECT_URL'] + output_filename_res,
-            'loss_path': current_app.config['S3_OBJECT_URL'] + output_filename_lc,
-            'exec_path': current_app.config['S3_OBJECT_URL'] + output_filename_tc,
-        });
+            current_app.config['OUTPUT_PARAMS'].update({
+                'total_time': task.info['total_time'],
+                'total_loss': json.loads(task.info['total_losses'])[-1],
+                'style_loss': json.loads(task.info['style_losses'])[-1],
+                'content_loss': json.loads(task.info['content_losses'])[-1],
+                'gen_image_width': task.info['gen_image_width'],
+                'gen_image_height': task.info['gen_image_height'],
+                'model_name': task.info['model_name'],
+                'num_iterations': int(task.info['total']),
+                'content_path': current_app.config['S3_OBJECT_URL'] + output_filename_ct,
+                'style_path': current_app.config['S3_OBJECT_URL'] + output_filename_st,
+                'result_path': current_app.config['S3_OBJECT_URL'] + output_filename_res,
+                'loss_path': current_app.config['S3_OBJECT_URL'] + output_filename_lc,
+                'exec_path': current_app.config['S3_OBJECT_URL'] + output_filename_tc,
+            });
 
         
-        if user.is_authenticated:
-            image = Image(
-                gen_image_path=current_app.config['OUTPUT_PARAMS']['result_path'],
-                gen_image_width=current_app.config['OUTPUT_PARAMS']['gen_image_width'],
-                gen_image_height=current_app.config['OUTPUT_PARAMS']['gen_image_height'],
-                num_iters=current_app.config['OUTPUT_PARAMS']['num_iterations'],
-                model_name=current_app.config['OUTPUT_PARAMS']['model_name'],
-                total_loss=str(current_app.config['OUTPUT_PARAMS']['total_loss']),
-                style_loss=str(current_app.config['OUTPUT_PARAMS']['style_loss']),
-                content_loss=str(current_app.config['OUTPUT_PARAMS']['content_loss']),
-                timestamp=datetime.utcnow(),
-                user_id=user_id
-                )
+            if user.is_authenticated:
+                image = Image(
+                    gen_image_path=current_app.config['OUTPUT_PARAMS']['result_path'],
+                    gen_image_width=current_app.config['OUTPUT_PARAMS']['gen_image_width'],
+                    gen_image_height=current_app.config['OUTPUT_PARAMS']['gen_image_height'],
+                    num_iters=current_app.config['OUTPUT_PARAMS']['num_iterations'],
+                    model_name=current_app.config['OUTPUT_PARAMS']['model_name'],
+                    total_loss=str(current_app.config['OUTPUT_PARAMS']['total_loss']),
+                    style_loss=str(current_app.config['OUTPUT_PARAMS']['style_loss']),
+                    content_loss=str(current_app.config['OUTPUT_PARAMS']['content_loss']),
+                    timestamp=datetime.utcnow(),
+                    user_id=user_id
+                    )
             
-            image.set_user(user)
-            db.session.add(image)
-            db.session.commit()
+                image.set_user(user)
+                db.session.add(image)
+                db.session.commit()
 
-            logger.info('Saved image to database.')
-
-
-        #params_render = {
-        #    'content': "../static/images/upload/content/" + file_names[0],
-        #    'style': "../static/images/upload/style/" + file_names[1],
-        #    'result': "../static/images/output/images/" + result_name
-        #}
-        session['total_loss'] = json.dumps(current_app.config['OUTPUT_PARAMS']['total_loss'])
-        session['style_loss'] = json.dumps(current_app.config['OUTPUT_PARAMS']['style_loss'])
-        session['content_loss'] = json.dumps(current_app.config['OUTPUT_PARAMS']['content_loss'])
-        for param in current_app.config['OUTPUT_PARAMS']:
-            if param not in ['total_loss','style_loss','content_loss']:
-                session[param] = current_app.config['OUTPUT_PARAMS'][param]
+                logger.info('Saved image to database.')
 
 
-    else:
-        # something went wrong in the background job
-        response = {
-            'state': task.state,
-            'current': 1,
-            'total': 1,
-            'status': str(task.info),  # this is the exception raised
-        }
-    return jsonify(response)
+            #params_render = {
+            #    'content': "../static/images/upload/content/" + file_names[0],
+            #    'style': "../static/images/upload/style/" + file_names[1],
+            #    'result': "../static/images/output/images/" + result_name
+            #}
+            session['total_loss'] = json.dumps(current_app.config['OUTPUT_PARAMS']['total_loss'])
+            session['style_loss'] = json.dumps(current_app.config['OUTPUT_PARAMS']['style_loss'])
+            session['content_loss'] = json.dumps(current_app.config['OUTPUT_PARAMS']['content_loss'])
+            for param in current_app.config['OUTPUT_PARAMS']:
+                if param not in ['total_loss','style_loss','content_loss']:
+                    session[param] = current_app.config['OUTPUT_PARAMS'][param]
+
+
+        else:
+            # something went wrong in the background job
+            response = {
+                'state': task.state,
+                'current': 1,
+                'total': 1,
+                'status': str(task.info),  # this is the exception raised
+            }
+        return jsonify(response)
+    except TypeError:
+        message = "TypeError: Invalid model type or input image types."
+        logger.error(message)
+        return render_template('style.html', message=message)
+    except tf.errors.InvalidArgumentError:
+        message = "Invalid image resolution. Dimensions must be even and divisible numbers(ex. 512x256)."
+        logger.error(message)
+        return render_template('style.html', message=message)
+    except:
+        message = "Unable to process the input images. Please try using a squared resolution(ex. 512x256)."
+        logger.error(message)
+        return render_template('style.html', message=message)
 
 
 @bp.route('/style', methods=['GET', 'POST'])
