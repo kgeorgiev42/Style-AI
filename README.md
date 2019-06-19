@@ -119,6 +119,7 @@ As of this point, the app has now been successfully deployed to Heroku in the cl
 However, due to the fact that I am using free tier dynos, bear in mind that it takes about 1 minute to load the server and the working pool. Heroku also does not provide GPU support and has limited CPU memory, so the model will inevitably run significantly slower in the cloud.
 
 With that said, here is how to configure this app to run locally through <b>Heroku</b> with <b>GPU</b> support:
+
 <b>1.</b> Create a <i>.env</i> file in the main directory with your environment variables:
 ```
 .env
