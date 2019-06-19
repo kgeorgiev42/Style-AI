@@ -287,10 +287,10 @@ def st_task():
         #return redirect(url_for('main.status', task_id=task.id))
         #async_result = celery.AsyncResult(id=task.task_id)
         #result_dict = async_result.get()
-    #except TypeError:
-        #message = "TypeError: Invalid model type or input image types."
-        #logger.error(message)
-        #return render_template('style.html', message=message)
+    except TypeError:
+        message = "TypeError: Invalid model type or input image types."
+        logger.error(message)
+        return render_template('style.html', message=message)
     except tf.errors.InvalidArgumentError:
         message = "Invalid image resolution. Dimensions must be even and divisible numbers(ex. 512x256)."
         logger.error(message)
@@ -378,7 +378,9 @@ def delete_image(id, user_image_id):
     if 'result_path' in current_app.config['MODEL_PARAMS']:
         delete_image_s3(current_app.config['MODEL_PARAMS']['result_path'].split('/')[-1],
                     current_app.config['MODEL_PARAMS']['loss_path'].split('/')[-1],
-                    current_app.config['MODEL_PARAMS']['exec_path'].split('/')[-1])
+                    current_app.config['MODEL_PARAMS']['exec_path'].split('/')[-1],
+                    current_app.config['MODEL_PARAMS']['content_path'].split('/')[-1],
+                    current_app.config['MODEL_PARAMS']['style_path'].split('/')[-1])
     '''
         try:
             os.remove(os.path.join('st_webservice/', img_location[3:]))

@@ -184,12 +184,14 @@
                         $(status_div.childNodes[5]).text('');
                         $(status_div.childNodes[6]).text('');
                         $(status_div.childNodes[7]).text('');
+                        if (data['status'] != 'Finished') {
                         div_results = $('<div id="results-url"><div></div></div>');
                         $('#results-url').append(div_results);
                         user_id = data['user_id'];
                         console.log('user:', user_id);
                         var results_url = flask_util.url_for('main.results', { id: user_id });
-                        $(div_results[0].childNodes[0]).html("Generation complete. To view the results click <a href=" + results_url + ">here</a>.");
+                            $(div_results[0].childNodes[0]).html("Generation complete. To view the results click <a href=" + results_url + ">here</a>.");
+                        }
                     }
                     else {
                         // rerun in 2 seconds
