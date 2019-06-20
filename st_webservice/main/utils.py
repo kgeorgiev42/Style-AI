@@ -62,17 +62,13 @@ def save_image_s3(best_img, filename):
 
   return "{}{}".format(current_app.config["S3_LOCATION"], filename)
 
-def delete_image_s3(result_file, loss_file, exec_file, content_file, style_file):
+def delete_image_s3(result_file):
 
   print('Deleting image files for object from s3..')
   app = current_app._get_current_object()
   with app.app_context():
     s3 = boto3.client("s3", aws_access_key_id=current_app.config['AWS_ACCESS_KEY_ID'], aws_secret_access_key=current_app.config['AWS_SECRET_ACCESS_KEY'])
     s3.delete_object(Bucket=current_app.config['FLASKS3_BUCKET_NAME'], Key=result_file)
-    s3.delete_object(Bucket=current_app.config['FLASKS3_BUCKET_NAME'], Key=loss_file)
-    s3.delete_object(Bucket=current_app.config['FLASKS3_BUCKET_NAME'], Key=exec_file)
-    s3.delete_object(Bucket=current_app.config['FLASKS3_BUCKET_NAME'], Key=content_file)
-    s3.delete_object(Bucket=current_app.config['FLASKS3_BUCKET_NAME'], Key=style_file)
 
 def plot_learning_curve_s3(iterations, total_losses, style_losses, content_losses, img_file_name):
   

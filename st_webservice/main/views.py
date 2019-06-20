@@ -380,11 +380,7 @@ def delete_image(id, user_image_id):
     logger.info(message)
     print(message)
     if 'result_path' in current_app.config['MODEL_PARAMS']:
-        delete_image_s3(current_app.config['MODEL_PARAMS']['result_path'].split('/')[-1],
-                    current_app.config['MODEL_PARAMS']['loss_path'].split('/')[-1],
-                    current_app.config['MODEL_PARAMS']['exec_path'].split('/')[-1],
-                    current_app.config['MODEL_PARAMS']['content_path'].split('/')[-1],
-                    current_app.config['MODEL_PARAMS']['style_path'].split('/')[-1])
+        delete_image_s3(img_location.split('/')[-1])
     '''
         try:
             os.remove(os.path.join('st_webservice/', img_location[3:]))
