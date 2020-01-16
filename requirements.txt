@@ -81,7 +81,7 @@ pyrsistent==0.14.11
 python-dateutil==2.8.0
 python-dotenv==0.10.3
 python-editor==1.0.4
-python-engineio==3.8.0
+python-engineio==3.8.2.post1
 python-socketio==4.1.0
 pytz==2019.1
 pywinpty==0.5.5
