@@ -25,7 +25,7 @@ defusedxml==0.5.0
 dnspython==1.16.0
 docutils==0.14
 entrypoints==0.3
-eventlet==0.24.1
+eventlet==0.31.0
 Flask==1.0.3
 Flask-Login==0.4.1
 Flask-Mail==0.9.1
