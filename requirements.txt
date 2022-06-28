@@ -1,7 +1,7 @@
 absl-py==0.7.1
 alembic==1.0.10
 amqp==2.4.2
-arrow==0.13.1
+arrow==0.15.1
 asn1crypto==0.24.0
 astor==0.7.1
 attrs==19.1.0
