@@ -57,7 +57,7 @@ Mako==1.0.9
 Markdown==3.1
 MarkupSafe==1.1.1
 matplotlib==3.0.3
-mistune==0.8.4
+mistune==2.0.3
 mock==2.0.0
 monotonic==1.5
 nbconvert==5.4.1
