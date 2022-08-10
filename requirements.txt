@@ -60,7 +60,7 @@ matplotlib==3.0.3
 mistune==0.8.4
 mock==2.0.0
 monotonic==1.5
-nbconvert==5.4.1
+nbconvert==6.3.0
 nbformat==4.4.0
 networkx==2.3
 numpy==1.16.2
